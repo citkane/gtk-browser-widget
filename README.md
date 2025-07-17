@@ -5,7 +5,7 @@ GBW is a cross platform [GTK 4](https://www.gtk.org/) widget that makes availabl
 - Chromium (TODO)
 - MsWebview2 (ALPHA stage)
 
-It uses the [gtkmm 4](https://gtkmm.gnome.org/en/) library for C++.<br>
+It is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library.<br>
 More language bindings are planned for the future.
 
 ### Basic usage:
@@ -28,10 +28,10 @@ public:
     set_default_size(1000, 900);
     set_child(browser);
   };
-
 private:
   gbw::Browser_widget browser;
 };
+
 
 #ifdef __WIN32__
 int CALLBACK WinMain(_In_ HINSTANCE /*hInstance*/,
@@ -46,7 +46,7 @@ int main() {
 ```
 
 ### Installation
-At this ALPHA stage, only MsWebview2 for Windows is available. For this you will need [MSys2](https://www.msys2.org/) installed, and then proceed from a MSys2 UCRT bash terminal.
+At this ALPHA stage, only MsWebview2 for Windows is available. For this you will need [MSys2](https://www.msys2.org/) installed, and then proceed from a MSys2 UCRT bash terminal:
 ```bash
 pacman -Suy # Do this twice for a fresh install
 pacman -S ...
@@ -67,8 +67,10 @@ run
 - Webkit
 - Chromium
 ## Development
+[Development notes](include/README.md)
+
 GBW wants to uncomplicate and unboilerplate the app development experience. What it does:
-- Starts up a browser engine instance
+- Starts a browser engine instance
 - Presents a browser window in a Gtk:Window
 - [Pseudo-embeds](include/gtk/README.md#gtkwindow-gtkwidget-and-embedding) the window in the user's Gtk::Widget
 - Presents to the developer a full API of their chosen web engine
