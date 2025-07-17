@@ -1,5 +1,7 @@
 # Gtk Browser Widget (GBW)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/88897872-a900-4218-920e-515fdfff02e4" width="600" />
+</p>
 GBW is a cross platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
 - Webkit (TODO)
 - Chromium (TODO)
