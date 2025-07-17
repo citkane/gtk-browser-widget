@@ -1,0 +1,49 @@
+#ifndef EBW_TYPES_TYPES_HH
+#define EBW_TYPES_TYPES_HH
+
+#include <gdkmm/event.h>
+#include <gdkmm/graphene_point.h>
+#include <gdkmm/graphene_rect.h>
+#include <gtkmm/widget.h>
+#include <gtkmm/window.h>
+#include <optional>
+
+#include "types/errors.hh"   // IWYU pragma: keep
+#include "types/includes.hh" // IWYU pragma: keep
+
+namespace gbw {
+class Browser_widget;
+
+namespace gtk {
+class Browser_window;
+}
+
+namespace types {
+
+struct offset_t {
+  int x;
+  int y;
+};
+
+constexpr Gdk::Event::Type FOCUS_CHANGE = Gdk::Event::Type::FOCUS_CHANGE;
+
+using gdk_event_t = const Glib::RefPtr<const Gdk::Event>;
+using gdk_bounds_t = std::optional<Gdk::Graphene::Rect>;
+using gdk_position_t = std::optional<Gdk::Graphene::Point>;
+
+using gtk_window_t = Gtk::Window;
+using gtk_widget_t = Gtk::Widget;
+using ebw_window_t = gbw::gtk::Browser_window;
+using ebw_widget_t = gbw::Browser_widget;
+
+using smart_env_t = smart_ptr<browser_env_t>;
+using smart_control_t = smart_ptr<browser_controller_t>;
+using smart_core_t = smart_ptr<browser_core_t>;
+
+using ready_signal_t = sigc::signal<void()>;
+
+} // namespace types
+using namespace types;
+} // namespace gbw
+
+#endif // EBW_TYPES_TYPES_HH

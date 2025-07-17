@@ -1,0 +1,9 @@
+/.build
+/.dist
+/.packages
+
+compile_commands.json
+/*.cc
+!/main.cc
+
+*.log
