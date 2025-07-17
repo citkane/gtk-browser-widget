@@ -1,4 +1,4 @@
-# Gtk Browser Widget
+# Gtk Browser Widget (GBW)
 
 GBW is a cross platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
 - Webkit (TODO)
@@ -46,14 +46,20 @@ int main() {
 ```
 
 ### Installation
-At this ALPHA stage, only MsWebview2 for Windows is available. For this you will need [MSys2](https://www.msys2.org/) installed, and then proceed from a MSys2 UCRT bash terminal:
+At this ALPHA stage, only MsWebview2 for Windows browser engine option is available.<br>
+You will need [MSys2](https://www.msys2.org/) installed, and then proceed from a MSys2 UCRT bash terminal:
 ```bash
-pacman -Suy # Do this twice for a fresh install
-pacman -S ...
+# Install Msys2 system dependencies
+pacman -Suy # Do this twice for a fresh install to update the core
+pacman -S mingw-w64-ucrt-x86_64-clang-tools-extra
+pacman -S mingw-w64-ucrt-x86_64-cmake
+pacman -S mingw-w64-ucrt-x86_64-gtkmm-4.0
 
+# Clone the GBW repository
 git clone https://github.com/citkane/gtk-browser-widget.git
 cd gtk-browser-widget
 
+# Use the installer script
 source installer.sh
 packages_install
 set_target examples/mswebview2/main.cc
