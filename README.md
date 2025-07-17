@@ -1,4 +1,5 @@
-# Gtk Browser Widget (GBW)
+<h1 align="center"> Gtk Browser Widget (GBW) </h1>
+
 <p align="center">
   <img width="600" alt="Gtk Browser Widget" src="https://github.com/user-attachments/assets/6933e9b3-8a31-47a9-9b77-c05b70e1e420" />
 </p>
