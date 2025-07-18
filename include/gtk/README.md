@@ -12,28 +12,44 @@ Header file that uses pragma guards to include the relevant browser engine class
 
 ## Class Hierarchy
 ```mermaid
-classDiagram
-    class Browser_widget["gbw::Browser_widget"] {
-      composed gbw::browser::Browser_engine browser
-      sigc::signal ready()
+classDiagram-v2
+    class Browser_widget["gbw::Browser_widget"]{
+        -Browser_engine browser_engine
+        +sigc::signal ready()
+        +Browser_core::apis get_browser_apis()
     }
-    class Browser_engine["gbw::browser::Browser_engine"]{
-      composed browser_API
-      virtual method_implementations()*
-    }
+
     class Browser_window["gbw::gtk::Browser_window"]{
-      pure virtual_method_declarations()*
-    }    
-    class Window["Gtk::Window"]
-    class Browser["3rd Party Browser Engine"] {
-      api environment_API()
-      api controller_API()
-      api core_API()
+      #varies virtual_method_declarations()*
     }
-    Browser_engine *-- Browser
+ 
+    class Browser_engine["gbw::browser::Browser_engine"]{
+        +Browser_engine(Browser_widget: &browser_widget)
+        +Browser_core::apis apis
+        -Browser_widget *browser_widget
+        #varies virtual_method_implementations()*
+        -Browser_core::apis init_browser_core()
+        
+    }
+   
+    class Window["Gtk::Window"]
+    class Widget["Gtk::Widget"]
+    class Application["Gtk::Application"]{
+        -Browser_widget gbw_widget
+    }
+    class Browser_core {
+      +api environment_API()
+      +api controller_API()
+      +api core_API()
+    }
+
+    Browser_engine *-- Browser_core
     Browser_engine --* Browser_widget
+    Browser_widget --* Application
     Browser_engine <|-- Browser_window
     Browser_window <|-- Window
+    Browser_widget <|-- Widget
+    Browser_engine <|.. Browser_widget
 ```
 
 ## `Gtk::Window`, `Gtk::Widget` and embedding
