@@ -79,7 +79,7 @@ void Browser_window::window_ready_cb() {
     present();
   });
 }
-
+// Dummy trigger for code review 2025-07-18
 void Browser_window::set_focus_controller() {
   auto focus_controller = Gtk::EventControllerLegacy::create();
   add_controller(focus_controller);
