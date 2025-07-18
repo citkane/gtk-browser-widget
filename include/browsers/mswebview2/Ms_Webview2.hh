@@ -97,6 +97,7 @@ private:
   /// UI changes and then natively pass them to pseudo-children.
   ///
   /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
+// Dummy trigger for code review 2025-07-18
   bool layout_update_cb();
   void fit_browser_to_window(LONG x, LONG y, LONG width, LONG height);
 
