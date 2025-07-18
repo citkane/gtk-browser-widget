@@ -93,7 +93,7 @@ void Ms_Webview2::set_browser_core(browser_core_t &core) {
 
   browser_ready_signal.emit();
 }
-
+// Dummy trigger for code review 2025-07-18
 bool Ms_Webview2::layout_update_cb() {
   auto &top_level_window = get_top_level_window();
   auto fudge = get_csd_fudge();
