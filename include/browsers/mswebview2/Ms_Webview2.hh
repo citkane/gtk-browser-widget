@@ -82,7 +82,7 @@ private:
 
   HWND browser_hWnd;
   HWND top_level_hWnd;
-
+// Dummy trigger for code review 2025-07-18
   void set_browser_env(browser_env_t &environment);
   void set_browser_controller(browser_controller_t &controller);
   void set_browser_core(browser_core_t &core);
@@ -97,6 +97,7 @@ private:
   /// UI changes and then natively pass them to pseudo-children.
   ///
   /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
+// Dummy trigger for code review 2025-07-18
   bool layout_update_cb();
   void fit_browser_to_window(LONG x, LONG y, LONG width, LONG height);
 

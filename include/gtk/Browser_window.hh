@@ -40,6 +40,7 @@ public:
   Browser_window(ebw_widget_t &ebw_widget);
 
   ready_signal_t &ready_signal() { return browser_ready_impl(); }
+// Dummy trigger for code review 2025-07-18
   smart_core_t &inner_api() { return browser_get_core_impl(); }
   smart_control_t &outer_api() { return browser_get_controller_impl(); }
 
