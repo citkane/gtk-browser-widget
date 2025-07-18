@@ -6,14 +6,13 @@
 
 
 GBW is a cross platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
-- Webkit (TODO)
-- Chromium (TODO)
-- MsWebview2 (ALPHA stage)
+- Webkit (todo) - [discussion](discussions/4)
+- Chromium (todo)
+- MsWebview2 (ALPHA)
 
-It is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library.<br>
-More language bindings are planned for the future.
+GBW is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library. More [language bindings](#language-bindings-todo) are planned for the future.
 
-### Basic usage:
+### Minimal usage:
 ```c++
 // gtkmm headers MUST be included first
 #include <gtkmm/applicationwindow.h>
@@ -75,21 +74,28 @@ run
 ```
 ## Example code
 - [MsWebview2](examples/mswebview2)
-- Webkit
-- Chromium
+- Webkit (todo)
+- Chromium (todo)
 ## Development
-[Development notes](include/README.md)
+Development notes:
+- [Contributing](include#contributing)
+- [Gtk 4](include#gtk-4)
+- [Operating Systems](include#operating-systems)
+- [Browser Engines](include#browser-engines)
 
 GBW wants to uncomplicate and unboilerplate the app development experience. What it does:
 - Starts a browser engine instance
-- Presents a browser window in a Gtk:Window
-- [Pseudo-embeds](include/gtk/README.md#gtkwindow-gtkwidget-and-embedding) the window in the user's Gtk::Widget
-- Presents to the developer a full API of their chosen web engine
+- Presents a browser window in a new top level Gtk:Window
+- [Pseudo-embeds](include/gtk/#gtkwindow-gtkwidget-and-embedding) the window into the user's Gtk::Widget
+- Provides to the developer a full API of their chosen web engine
 
 From there, it is the developer's prerogative to plumb up their GTK application to the browser API in a way that suits their logic. GBW is not a framework, but rather a simple tool.
 
 ## Plugins
 Plugins optionally extend GBW to provide functionallity for common usage patterns.
 
-#### Bind (TODO)
-Provides an easy to consume interface that binds native callback functions to browser-side javascript functions. 
+#### Bind (todo)
+Provides an easy to consume interface that binds native callback functions to browser-side javascript functions.
+
+## Language Bindings (todo)
+GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
