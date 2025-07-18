@@ -5,7 +5,7 @@
 </p>
 
 
-GBW is a cross platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
+GBW is a cross-platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
 - MsWebview2 (ALPHA)
 - Webkit (todo) - [discussion](discussions/4)
 - Chromium (todo)
@@ -77,18 +77,21 @@ run
 - [MsWebview2](examples/mswebview2)
 - Webkit (todo)
 - Chromium (todo)
+
+## Contributing
+Please [fork](https://github.com/citkane/gtk-browser-widget/fork) this repository and submit pull requests against the [development branch](https://github.com/citkane/gtk-browser-widget/tree/development).
+
 ## Development
 Development notes:
-- [Contributing](include#contributing)
 - [Gtk 4](include#gtk-4)
 - [Operating Systems](include#operating-systems)
 - [Browser Engines](include#browser-engines)
 
-GBW wants to uncomplicate and unboilerplate the app development experience. What it does:
-- Starts a browser engine instance
-- Presents a browser window in a new top level `Gtk:Window`
-- [Pseudo-embeds](include/gtk/#gtkwindow-gtkwidget-and-embedding) the window into the user's `gbw::Browser_widget`
-- Provides to the developer a full API of their chosen web engine
+GBW wants to uncomplicate and unboilerplate the embedded browser app development experience. What it does:
+- Starts a browser engine instance,
+- presents a browser window in a new top level `Gtk:Window`
+- [pseudo-embeds](include/gtk/#gtkwindow-gtkwidget-and-embedding) the window into the `gbw::Browser_widget` instance,
+- provides to the developer a full API of their chosen web engine
 
 From there, it is the developer's prerogative to plumb up their GTK application to the browser API in a way that suits their logic. GBW is not a framework, but rather a simple tool.
 
