@@ -87,3 +87,9 @@ GBW wants to uncomplicate and unboilerplate the app development experience. What
 - Presents to the developer a full API of their chosen web engine
 
 From there, it is the developer's prerogative to plumb up their GTK application to the browser API in a way that suits their logic. GBW is not a framework, but rather a simple tool.
+
+## Plugins
+Plugins optionally extend GBW to provide functionallity for common usage patterns.
+
+#### Bind (TODO)
+Provides an easy to consume interface that binds native callback functions to browser-side javascript functions. 
