@@ -69,6 +69,7 @@ packages_install
 set_target examples/mswebview2/main.cc
 generate
 build
+install
 run
 
 ```
