@@ -7,7 +7,7 @@
 
 GBW is a cross-platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
 - MsWebview2 (ALPHA)
-- Webkit (todo) - [discussion](discussions/4)
+- Webkit (todo) - [discussion](https://github.com/citkane/gtk-browser-widget/discussions/4)
 - Chromium (todo)
 
 GBW is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library. More [language bindings](#language-bindings-todo) are planned for the future.
