@@ -82,7 +82,7 @@ private:
 
   HWND browser_hWnd;
   HWND top_level_hWnd;
-
+// Dummy trigger for code review 2025-07-18
   void set_browser_env(browser_env_t &environment);
   void set_browser_controller(browser_controller_t &controller);
   void set_browser_core(browser_core_t &core);
