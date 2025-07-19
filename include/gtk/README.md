@@ -13,44 +13,126 @@ Header file that uses pragma guards to include the relevant browser engine class
 ## Class Hierarchy
 ```mermaid
 classDiagram-v2
-    class Browser_widget["gbw::Browser_widget"]{
-        -Browser_engine browser_engine
-        +sigc::signal ready()
-        +Browser_core::apis get_browser_apis()
+    namespace gbw_custom_Gtk {
+      class Browser_widget["gbw::Browser_widget"]{
+          +sigc::signal ready()
+          +Browser_core::apis get_browser_apis()
+          #Gtk::Widget.methods()
+          -Browser_engine browser_engine
+      }
+
+      class Browser_window["gbw::gtk::Browser_window"]{
+        #Gtk::Window.methods()
+        #gbw::gtk common_methods()
+        #OS methods()
+        #virtual Browser_declarations()*
+      }
     }
 
-    class Browser_window["gbw::gtk::Browser_window"]{
-      #varies virtual_method_declarations()*
-    }
- 
     class Browser_engine["gbw::browser::Browser_engine"]{
         +Browser_engine(Browser_widget: &browser_widget)
-        +Browser_core::apis apis
+        +Browser::apis apis
+
+        #OS methods()
+        #virtual browser_impls()*
+        
+        -Browser::apis init_browser()
         -Browser_widget *browser_widget
-        #varies virtual_method_implementations()*
-        -Browser_core::apis init_browser_core()
         
     }
-   
-    class Window["Gtk::Window"]
-    class Widget["Gtk::Widget"]
-    class Application["Gtk::Application"]{
-        -Browser_widget gbw_widget
+
+    class Lib_gtk["gbw::gtk::Lib_gtk"]{
+      #gbw::gtk common_methods()
+      #virtual OS_declarations()*
     }
-    class Browser_core {
+
+    namespace OS_libs {
+      class Lib_mac["gbw::os::mac::Lib_mac"]{
+        #gbw::gtk common_methods()
+        #virtual OS_impls()*
+      }
+      class Lib_win["gbw::os::win::Lib_win"]{
+        #gbw::gtk common_methods()
+        #virtual OS_impls()*
+      }
+      class Lib_linux["gbw::os::linuz::Lib_linux"]{
+        #gbw::gtk common_methods()
+        #virtual OS_impls()*
+      }
+    }
+
+    namespace Gtk {
+      class Widget["Gtk::Widget"]{
+        #Gtk::Widget.methods()
+      }
+      class Window["Gtk::Window"] {
+        #Gtk::Window.methods()
+      }
+    }
+
+
+    namespace User_entry {
+      class Application["Gtk::Application"]
+      class User_application{
+        -Browser_widget gbw_widget
+      }
+    }
+  
+ namespace Browser {
+    class Webkit {
       +api environment_API()
       +api controller_API()
       +api core_API()
     }
+    class MsWebview2 {
+      +api environment_API()
+      +api controller_API()
+      +api core_API()
+    }
+    class Chromium {
+      +api environment_API()
+      +api controller_API()
+      +api core_API()
+    }
+ }
 
-    Browser_engine *-- Browser_core
-    Browser_engine --* Browser_widget
-    Browser_widget --* Application
     Browser_engine <|-- Browser_window
-    Browser_window <|-- Window
+    Browser_engine *-- Webkit : or
+    Browser_engine *-- Chromium : or
+    Browser_engine *-- MsWebview2 : or
+    Browser_engine --* Browser_widget
+
+    Browser_widget --* User_application
     Browser_widget <|-- Widget
+
+    User_application <|-- Application
+
+    Browser_window <|-- Window
+
     Browser_engine <|.. Browser_widget
+
+    Browser_window <|-- Lib_win : or
+    Browser_window <|-- Lib_mac : or
+    Browser_window <|-- Lib_linux : or
+
+    Lib_win <|-- Lib_gtk
+    Lib_mac <|-- Lib_gtk
+    Lib_linux <|-- Lib_gtk
+    
 ```
+
+
+
+
+
+    
+    
+
+    
+    
+
+    
+    
 
 ## `Gtk::Window`, `Gtk::Widget` and embedding
 Gtk >= 4 no longer supports embedding native windows within native windows. This leaves two options for embedding a browser engine window:
