@@ -16,57 +16,57 @@ classDiagram-v2
     namespace gbw_custom_Gtk {
       class Browser_widget["gbw::Browser_widget"]{
           +sigc::signal ready()
-          +Browser_core::apis get_browser_apis()
+          +Browser::apis get_browser_apis()
           #Gtk::Widget.methods()
           -Browser_engine browser_engine
       }
 
       class Browser_window["gbw::gtk::Browser_window"]{
-        #Gtk::Window.methods()
-        #gbw::gtk common_methods()
-        #OS methods()
-        #virtual Browser_declarations()*
+        #Gtk::Window methods()
+        #gbw::gtk common()
+        #OS impls()
+        #virtual::Browser declarations()*
       }
     }
 
     class Browser_engine["gbw::browser::Browser_engine"]{
         +Browser_engine(Browser_widget: &browser_widget)
-        +Browser::apis apis
+        +Browser::apis get_apis()
 
-        #OS methods()
-        #virtual browser_impls()*
+        #OS impls()
+        #gbw::gtk common()
+        #virtual::Browser impls()*
         
-        -Browser::apis init_browser()
         -Browser_widget *browser_widget
         
     }
 
     class Lib_gtk["gbw::gtk::Lib_gtk"]{
-      #gbw::gtk common_methods()
-      #virtual OS_declarations()*
+      #gbw::gtk common()
+      #virtual::OS declarations()*
     }
 
     namespace OS_libs {
       class Lib_mac["gbw::os::mac::Lib_mac"]{
-        #gbw::gtk common_methods()
-        #virtual OS_impls()*
+        #gbw::gtk common()
+        #virtual::OS impls()*
       }
       class Lib_win["gbw::os::win::Lib_win"]{
-        #gbw::gtk common_methods()
-        #virtual OS_impls()*
+        #gbw::gtk common()
+        #virtual::OS impls()*
       }
       class Lib_linux["gbw::os::linuz::Lib_linux"]{
-        #gbw::gtk common_methods()
-        #virtual OS_impls()*
+        #gbw::gtk common()
+        #virtual::OS impls()*
       }
     }
 
     namespace Gtk {
       class Widget["Gtk::Widget"]{
-        #Gtk::Widget.methods()
+        #Gtk::Widget methods()
       }
       class Window["Gtk::Window"] {
-        #Gtk::Window.methods()
+        #Gtk::Window methods()
       }
     }
 
