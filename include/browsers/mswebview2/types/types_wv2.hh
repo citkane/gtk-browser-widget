@@ -24,9 +24,10 @@
 
 #ifndef EBW_BROWSERS_MSWEBVIEW2_TYPES_TYPES_WV2_HH
 #define EBW_BROWSERS_MSWEBVIEW2_TYPES_TYPES_WV2_HH
-#if defined(__WIN32__) && defined(EBW_MSWEBVIEW2)
+#if defined(_WIN32) && defined(EBW_MSWEBVIEW2)
 
-#include "browsers/mswebview2/lib/mingw32_compat.hh"
+#include "browsers/mswebview2/lib/mingw32_compat.hh"  // IWYU pragma: keep
+#include <WebView2.h>
 
 namespace gbw::browsers::mswebview2 {
 
@@ -40,5 +41,5 @@ using browser_core_t = ICoreWebView2;
 
 } // namespace gbw::browsers::mswebview2
 
-#endif // defined(__WIN32__) && defined(EBW_MSWEBVIEW2)
+#endif // defined(_WIN32) && defined(EBW_MSWEBVIEW2)
 #endif // EBW_BROWSERS_MSWEBVIEW2_TYPES_TYPES_WV2_HH

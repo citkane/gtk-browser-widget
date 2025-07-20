@@ -24,7 +24,7 @@
 
 #ifndef EBW_OS_WINDOWS_LIB_WIN_HH
 #define EBW_OS_WINDOWS_LIB_WIN_HH
-#ifdef __WIN32__
+#ifdef _WIN32
 
 #include "gtk/lib/Lib_gtk.hh"
 #include "types/types.hh"
@@ -76,5 +76,5 @@ inline void attach_win32_console() {
 } // namespace options
 } // namespace gbw
 
-#endif // __WIN32__
+#endif // _WIN32
 #endif // EBW_OS_WINDOWS_LIB_WIN_HH

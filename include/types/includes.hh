@@ -25,7 +25,7 @@
 #ifndef EBW_TYPES_INCLUDES_HH
 #define EBW_TYPES_INCLUDES_HH
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #include "os/windows/types/types_winos.hh" // IWYU pragma: keep
 using namespace gbw::os::windows;
 
@@ -34,5 +34,5 @@ using namespace gbw::os::windows;
 using namespace gbw::browsers::mswebview2;
 
 #endif // EBW_MSWEBVIEW2
-#endif // __WIN32__
+#endif // _WIN32
 #endif // EBW_TYPES_INCLUDES_HH

@@ -24,7 +24,7 @@
 
 #ifndef EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
 #define EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
-#ifdef __WIN32__
+#ifdef _WIN32
 
 #include <Unknwn.h>
 #include <gdk/win32/gdkwin32.h>
@@ -114,5 +114,5 @@ public:
 
 } // namespace gbw::os::windows
 
-#endif // __WIN32__
+#endif // _WIN32
 #endif // EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH

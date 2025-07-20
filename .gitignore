@@ -1,6 +1,7 @@
 /.build
 /.dist
 /.packages
+/.cache
 
 compile_commands.json
 /*.cc

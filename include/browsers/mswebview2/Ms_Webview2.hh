@@ -32,7 +32,7 @@
 
 #ifndef EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
 #define EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
-#if defined(__WIN32__) && defined(EBW_MSWEBVIEW2)
+#if defined(_WIN32) && defined(EBW_MSWEBVIEW2)
 
 #include "browsers/mswebview2/lib/Controller.hh"
 #include "browsers/mswebview2/lib/Environment.hh"
@@ -108,5 +108,5 @@ private:
 using Browser_engine = gbw::browsers::mswebview2::Ms_Webview2;
 } // namespace gbw
 
-#endif // __WIN32__
+#endif // _WIN32
 #endif // EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
