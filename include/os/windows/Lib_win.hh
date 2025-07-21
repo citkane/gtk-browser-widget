@@ -32,7 +32,8 @@
 using namespace gbw::gtk;
 
 namespace gbw {
-namespace os::windows {
+namespace os {
+namespace windows {
 
 /// @brief Library for interfacing with Windows OS system API.
 ///
@@ -44,28 +45,30 @@ namespace os::windows {
 /// @ref os/windows/types/types_winos.hh
 class Lib_win : protected Lib_gtk {
 public:
+  Lib_win(gbw_widget_t *widget, gbw_browser_t *browser);
+
   /// @copydoc gbw::attach_win32_console
   static void attach_win32_console();
 
 protected:
-  /// Converts a `Gtk::Window` to a Windows `HWND`
-  ///
-  /// @throws exception if conversion fails.
-  HWND get_hWnd_from_gtk(gtk_window_t &window);
+  /// @copydoc gbw::gtk::Lib_gtk:native_window_from_gtk_imp
+  HWND native_window_from_gtk_imp(gtk_window_t &window) override;
 
-  float get_hwnd_dpi_scale(HWND &hWnd);
+  /// @copydoc gbw::gtk::Lib_gtk::native_window_dpi_scale_imp
+  float native_window_dpi_scale_imp(HWND &hWnd) override;
 
-  // For CSD managed Gtk::Windows, we need to positionally compensate for the
-  // GTK decorations which are included in the HWND measurement.
-  offset_t get_decorations_offset(HWND &hWnd, gtk_window_t &window,
-                                  offset_t &fudge);
+  ///// @copydoc gbw::gtk::Lib_gtk::csd_decorations_offset_imp
+  // offset_t csd_decorations_offset_imp(HWND &hWnd, gtk_window_t &window,
+  //                                     offset_t &fudge) override;
 
 private:
   static bool is_console_attached;
 };
 
-} // namespace os::windows
+} // namespace windows
+using Lib_os = windows::Lib_win;
 
+} // namespace os
 namespace options {
 /// Attach the windows console to the parent GUI process so that we can get
 /// debug output

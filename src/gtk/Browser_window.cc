@@ -32,9 +32,9 @@
 
 using namespace gbw::gtk;
 
-Browser_window::~Browser_window() {}
+// Browser_window::~Browser_window() {}
 
-Browser_window::Browser_window(ebw_widget_t &widget) : browser_widget(&widget) {
+Browser_window::Browser_window(gbw_widget_t *widget) : Lib_os(widget, this) {
   Gtk::manage(this);
 
   browser_window_init_config();
@@ -63,17 +63,11 @@ void Browser_window::window_realised_cb() {
 
 void Browser_window::window_ready_cb() {
   std::cout << "Browser window is ready\n";
-  auto root_ptr = browser_widget->get_root();
-  top_level_window = dynamic_cast<gtk_window_t *>(root_ptr);
-  if (!top_level_window) {
-    throw ebw_error("Failed to get the top level gtk::Window");
-  }
 
   set_focus_controller();
-  set_transient_for(*top_level_window);
-  set_native_windows_impl(*this, *top_level_window);
-
+  set_transient_for(get_top_window());
   browser_engine_init_impl();
+
   browser_ready_impl().connect([this] {
     set_visible(true);
     present();
@@ -90,7 +84,7 @@ void Browser_window::set_focus_controller() {
         if (!focus_changed) {
           return true;
         }
-        top_level_window->present();
+        get_top_window().present();
         return false;
       },
       true);

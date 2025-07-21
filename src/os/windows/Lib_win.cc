@@ -23,9 +23,14 @@
  */
 
 #include "os/windows/Lib_win.hh"
+#include "Browser_widget.hh"
+#include "gtk/Browser_window.hh"
 
 using namespace gbw;
 using namespace gbw::os::windows;
+
+Lib_win::Lib_win(gbw_widget_t *widget, gbw_browser_t *browser)
+    : Lib_gtk(widget, browser) {};
 
 void Lib_win::attach_win32_console() {
   if (is_console_attached) {
@@ -42,7 +47,7 @@ void Lib_win::attach_win32_console() {
 }
 bool Lib_win::is_console_attached{};
 
-HWND Lib_win::get_hWnd_from_gtk(gtk_window_t &window) {
+HWND Lib_win::native_window_from_gtk_imp(gtk_window_t &window) {
   auto surface = window.get_native()->get_surface();
   if (!surface->gobj()) {
     throw ebw_error("Failed to get surface from Gtk:Window");
@@ -56,7 +61,7 @@ HWND Lib_win::get_hWnd_from_gtk(gtk_window_t &window) {
   return hWnd;
 }
 
-float Lib_win::get_hwnd_dpi_scale(HWND &hWnd) {
+float Lib_win::native_window_dpi_scale_imp(HWND &hWnd) {
   // Try Windows 10+ API: GetDpiForWindow
   // Windows 10+ implements per monitor dpi and other features, so we can't rely
   // on the fallback for a fully integrated experience.
@@ -85,15 +90,15 @@ float Lib_win::get_hwnd_dpi_scale(HWND &hWnd) {
   return dpi / 96.0f;
 }
 
-offset_t Lib_win::get_decorations_offset(HWND &hWnd, gtk_window_t &window,
-                                         offset_t &fudge) {
+offset_t Lib_win::csd_decorations_offset_imp(HWND &hWnd, gtk_window_t &window,
+                                             offset_t &fudge) {
   if (window.is_maximized() || !is_using_gtk_csd(window)) {
     return {0, 0};
   }
   // Get the HWND browser window size in scaled pixels
   RECT rect;
   GetWindowRect(hWnd, &rect);
-  auto scale = get_hwnd_dpi_scale(hWnd);
+  auto scale = native_window_dpi_scale_imp(hWnd);
   float wr_w = (rect.right - rect.left) * scale;
   float wr_h = (rect.bottom - rect.top) * scale;
   // Get the Gtk::Window browser size

@@ -23,11 +23,13 @@
  */
 
 #include "gtk/lib/Lib_gtk.hh"
+#include "Browser_widget.hh" // IWYU pragma: keep
 
 using namespace gbw;
 using namespace gbw::gtk;
 
-bool Lib_gtk::is_using_gtk_csd(gtk_window_t &window) {
+bool gtk_t::csd_t::is_active() {
+  auto &window = self->window.top_level();
   auto is_application = !!window.get_application();
   auto has_titlebar = !!window.get_titlebar();
   auto csd_env = std::getenv("GTK_CSD");
@@ -48,6 +50,40 @@ bool Lib_gtk::is_using_gtk_csd(gtk_window_t &window) {
   // return has_titlebar;
 }
 
-void Lib_gtk::set_csd_fudge(int x, int y) { csd_fudge = {x, y}; };
-offset_t &Lib_gtk::get_csd_fudge() { return csd_fudge; }
+gtk_window_t &gtk_t::window_t::top_level() {
+  return self->widget->get_top_level_window();
+};
+
+gtk_window_t &gtk_t::window_t::browser() {
+  gtk_window_t *browser_ = self->browser;
+  return *browser_;
+};
+
+offset_t &gtk_t::csd_t::fudge() { return self->csd_fudge; }
+
+offset_t gtk_t::csd_t::get_offset(size_t &native_size) {
+  auto &window = self->window.top_level();
+  if (window.is_maximized() || !self->csd.is_active()) {
+    return {0, 0};
+  }
+  // Get the HWND browser window size in scaled pixels
+  // RECT rect;
+  // GetWindowRect(hWnd, &rect);
+  // auto scale = native_window_dpi_scale_imp(hWnd);
+  // float wr_w = (rect.right - rect.left) * scale;
+  // float wr_h = (rect.bottom - rect.top) * scale;
+  // Get the Gtk::Window browser size
+  auto tl_w = window.get_allocated_width();
+  auto tl_h = window.get_allocated_height();
+  // Half the total decoration size in each direction gives us a best estimate
+  // additional xy origin adjustment. We may still need to apply an additional
+  // user provided fudge depending on the asymmetary of any given theme.
+  int dec_x = floor(float(native_size.width - tl_w) / 2) + self->csd_fudge.x;
+  int dec_y = floor(float(native_size.height - tl_h) / 2) + self->csd_fudge.y;
+
+  return {dec_x, dec_y};
+}
+
+void gtk_t::csd_t::fudge(int x, int y) { Lib_gtk::csd_fudge = {x, y}; };
+
 offset_t Lib_gtk::csd_fudge{0, 0};

@@ -37,7 +37,6 @@
 #include "browsers/mswebview2/lib/Controller.hh"
 #include "browsers/mswebview2/lib/Environment.hh"
 #include "gtk/Browser_window.hh"
-#include "os/windows/Lib_win.hh"
 #include "types/types.hh"
 
 using namespace gbw::os::windows;
@@ -45,22 +44,18 @@ using namespace gbw::os::windows;
 namespace gbw {
 namespace browsers::mswebview2 {
 
-class Ms_Webview2 : Lib_win,
-                    lib_mswebview2::Environment,
+class Ms_Webview2 : lib_mswebview2::Environment,
                     lib_mswebview2::Controller,
                     public gtk::Browser_window {
 public:
   ~Ms_Webview2() override;
-  Ms_Webview2(ebw_widget_t &widget);
+  Ms_Webview2(gbw_widget_t *widget);
 
 protected:
   /// @copydoc gtk::Browser_window::browser_get_core_imp
   smart_core_t &browser_get_core_impl() override;
   /// @copydoc gtk::Browser_window::browser_get_controller_impl
   smart_control_t &browser_get_controller_impl() override;
-  /// @copydoc gtk::Browser_window::set_native_windows_impll
-  void set_native_windows_impl(gtk_window_t &browser_window,
-                               gtk_window_t &top_level_window) override;
   /// @copydoc gtk::Browser_window::browser_engine_init_impl
   void browser_engine_init_impl() override;
   /// @copydoc gtk::Browser_window::browser_ready_imp
@@ -69,8 +64,6 @@ protected:
   };
 
 private:
-  gtk_widget_t *browser_widget;
-
   gdk_bounds_t bounds;
 
   smart_env_t browser_environment;

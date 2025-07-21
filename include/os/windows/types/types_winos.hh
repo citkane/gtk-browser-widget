@@ -30,7 +30,7 @@
 #include <gdk/win32/gdkwin32.h>
 
 namespace gbw::os::windows {
-
+using native_window_t = HWND;
 /// A replacement for the MSVC only wil::com_ptr smart pointer
 /// @see https://github.com/microsoft/wil/wiki/WinRT-and-COM-wrappers
 template <typename T> class smart_ptr {

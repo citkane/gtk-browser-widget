@@ -44,9 +44,18 @@ class Browser_window;
 
 namespace types {
 
+template <typename T> struct nested_api_t {
+  T *self;
+  nested_api_t(T *self) : self(self) {}
+};
+
 struct offset_t {
   int x;
   int y;
+};
+struct size_t {
+  int width;
+  int height;
 };
 
 constexpr Gdk::Event::Type FOCUS_CHANGE = Gdk::Event::Type::FOCUS_CHANGE;
@@ -57,8 +66,8 @@ using gdk_position_t = std::optional<Gdk::Graphene::Point>;
 
 using gtk_window_t = Gtk::Window;
 using gtk_widget_t = Gtk::Widget;
-using ebw_window_t = gbw::gtk::Browser_window;
-using ebw_widget_t = gbw::Browser_widget;
+using gbw_browser_t = gbw::gtk::Browser_window;
+using gbw_widget_t = gbw::Browser_widget;
 
 using smart_env_t = smart_ptr<browser_env_t>;
 using smart_control_t = smart_ptr<browser_controller_t>;

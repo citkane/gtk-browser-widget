@@ -26,7 +26,8 @@
 #define EBW_WIDGET_HH
 
 #include "gtk/Browser_engine.hh" // IWYU pragma: keep
-#include "gtk/lib/Lib_gtk.hh"    // IWYU pragma: keep
+#include "gtk/Browser_window.hh"
+#include "gtk/lib/Lib_gtk.hh" // IWYU pragma: keep
 #include "types/types.hh"
 
 using namespace gbw::types;
@@ -40,7 +41,7 @@ public:
     std::cout << "Destroyed Browser_widget" << std::endl;
   }
 
-  Browser_widget() : browser_engine(*this) {
+  Browser_widget() : browser_engine(this) {
     Gtk::manage(this);
     init_widget_layout();
     browser_engine.ready_signal().connect([this] {
@@ -69,6 +70,12 @@ private:
     set_margin_start(0);
     set_margin_end(0);
   }
+
+  gtk_window_t &get_top_level_window() {
+    return *dynamic_cast<gtk_window_t *>(get_root());
+  };
+
+  friend struct gbw::gtk::gtk_t::window_t;
 };
 
 } // namespace gbw
