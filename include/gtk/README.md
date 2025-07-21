@@ -116,6 +116,7 @@ classDiagram
     }
 
 
+    note for Browser_engine "Pragma included from 'gtk/Browser_engine.hh'<br>Each 'browsers/*/*.hh' header aliases it's Browser class to 'gbw::browsers::Browser_engine'"
     class Browser_engine["gbw::browser::Browser_engine"]:::other {
         <<Aliased>>
         +Browser_engine(Browser_widget: *browser_widget)
