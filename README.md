@@ -103,3 +103,14 @@ Provides an easy to consume interface that binds native callback functions to br
 
 ## Language Bindings (todo)
 GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
+
+GObject Introspection support is required and will be implemented for GTK ecosystem integration and to provide compability with the [gir.core](https://github.com/gircore/gir.core) project. This will generate automatic bindings for the following [GTK supported](https://www.gtk.org/) languages:
+
+- C
+- JavaScript
+- Perl
+- Python
+- Rust
+- Vala 
+
+SWIG or another such system may be used to generate bindings for other languages.
