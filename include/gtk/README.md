@@ -152,8 +152,8 @@ classDiagram
         }
     }
 
-    classDef gbw fill:#FCF5FF; 
-    classDef other fill:#FFFFFF00
+    classDef gbw fill:#FCF5FF, stroke:#343238 
+    classDef other fill:#FFFFFF00, stroke:#343238
 ```
 
 ## `Gtk::Window`, `Gtk::Widget` and embedding
