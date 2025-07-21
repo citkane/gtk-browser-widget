@@ -15,6 +15,12 @@ MSWEBVIEW_VERSION=1.0.3351.48
 MSWEBVIEW_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include
 MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64
 
+
+
+CEF_VERSION=138.0.17
+CEF_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CEF_VERSION/build/native/include
+CEF_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CEF_VERSION/build/native/x64
+
 SYS_OPTS=""
 
 PATH=$(cygpath -w /ucrt64/bin):$PATH
@@ -26,7 +32,8 @@ check_env
 
 PACKAGE_INSTALL_HELP="\
 #  Installs required library packages.
-#  ATM only MSWEBVIEW2 on Windows is supported, so we leave this as basic logic.
+#  ATM only MSWEBVIEW2 on Windows is fully supported, so we leave this as basic logic.
+#  The installer currently supports CEF
 #  @todo Expand the logic for mutiple OS and embedded browser packages.
 ## Usage:
 #   packages_install\
@@ -44,6 +51,9 @@ packages_install() {
         curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
     fi
     $nuget install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
+    # Provide CEF support via the runtime: https://www.nuget.org/packages/chromiumembeddedframework.runtime
+    $nuget install chromiumembeddedframework.runtime -Version $CEF_VERSION -OutputDirectory "$PACKAGE_DIR"
+
 }
 
 SET_TARGET_HELP="\

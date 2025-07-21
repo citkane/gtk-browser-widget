@@ -64,19 +64,24 @@ check_env() {
     msys* | cygwin* | mingw*)
         # Now check if the environment is MSYS2 UCRT
         if [ "$MSYSTEM" != "UCRT64" ]; then
-throw_error "\
+            throw_error "\
 On Windows, you must use the MSYS2 UCRT64 terminal environment for this script.\n\
-For download and installation, see: https://www.msys2.org" && return 1
+For download and installation, see: https://www.msys2.org"
+            return 1
         fi
         SYS_OPTS="\
 -DMSWEBVIEW_INCLUDE_DIR=$MSWEBVIEW_INCLUDE_DIR \
 -DMSWEBVIEW_LIB_DIR=$MSWEBVIEW_LIB_DIR \
--DMSWEBVIEW2=ON \
-        "
+-DCEF_INCLUDE_DIR=$CEF_INCLUDE_DIR \
+-DCEF_LIB_DIR=$CEF_LIB_DIR \
+-DCEF=ON \
+-DMSWEBVIEW2=ON"
+        ;;
     esac
 
     return 0;
 }
+
 
 resolve_path() {
   echo "$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")"
