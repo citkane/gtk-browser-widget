@@ -12,16 +12,7 @@ Header file that uses pragma guards to include the relevant browser engine class
 
 ## Class Hierarchy
 ```mermaid
----
-  config:
-    class:
-      hideEmptyMembersBox: true
-
----
-
 classDiagram
-    classDef bgw fill:#f9f,stroke:#333,stroke-width:4px; 
-
     Browser_widget *-- User_application
     User_application <|-- Application
 
@@ -48,24 +39,22 @@ classDiagram
     Lib_linux <|-- Lib_os
     Lib_os <|-- Lib_browser
     
-
-
     namespace User_entry {
-      class Application["Gtk::Application"]
-      class User_application{
+      class Application["Gtk::Application"]:::other
+      class User_application:::other {
         -Browser_widget gbw_widget
       }
     }
     
     namespace virtual_declarations {
-      class Lib_browser["gbw::browsers::Lib_browser"]:::gbw{
+      class Lib_browser["gbw::browsers::Lib_browser"]:::gbw {
         <<Abstract>> 
         #virtual browser_declarations()*
         #OS impls()
         #gbw::gtk common()
       } 
       
-      class Lib_os["gbw::os::Lib_os"]{
+      class Lib_os["gbw::os::Lib_os"]:::gbw {
         <<Abstract>>
         #virtual OS_declarations()*
         #gbw::gtk common()
@@ -73,14 +62,14 @@ classDiagram
     }
 
     namespace gbw_custom_Gtk {
-      class Browser_widget["gbw::Browser_widget"]{
+      class Browser_widget["gbw::Browser_widget"]:::gbw {
           +sigc::signal ready()
           +Browser_core::apis get_browser_apis()
           #Gtk::Widget.methods()
           -Browser_engine browser_engine
       }
 
-      class Browser_window["gbw::gtk::Browser_window"]{
+      class Browser_window["gbw::gtk::Browser_window"]:::gbw {
         #Gtk::Window.methods()
         #gbw::gtk common()
         #OS methods()
@@ -88,38 +77,38 @@ classDiagram
       }
     }
 
-    class Lib_gtk["gbw::gtk::Lib_gtk"]{
+    class Lib_gtk["gbw::gtk::Lib_gtk"]:::gbw {
       -gbw::Browser_widget widget
       -gbw::Browser_window window
       #gbw::gtk common()
     }
 
     namespace OS {
-      class Lib_mac["gbw::os::mac::Lib_mac"]{
+      class Lib_mac["gbw::os::mac::Lib_mac"]:::gbw {
         #gbw::gtk common()
         #virtual OS_impls()*
       }
-      class Lib_win["gbw::os::win::Lib_win"]{
+      class Lib_win["gbw::os::win::Lib_win"]:::gbw {
         #gbw::gtk common()
         #virtual OS_impls()*
       }
-      class Lib_linux["gbw::os::linuz::Lib_linux"]{
+      class Lib_linux["gbw::os::linuz::Lib_linux"]:::gbw {
         #gbw::gtk common()
         #virtual OS_impls()*
       }
     }
 
     namespace Gtk {
-      class Widget["Gtk::Widget"]{
+      class Widget["Gtk::Widget"]:::other {
         #Gtk::Widget.methods()
       }
-      class Window["Gtk::Window"] {
+      class Window["Gtk::Window"]:::other {
         #Gtk::Window.methods()
       }
     }
 
 
-    class Browser_engine["gbw::browser::Browser_engine (aliased)"]{
+    class Browser_engine["gbw::browser::Browser_engine (aliased)"]:::other {
         +Browser_engine(Browser_widget: &browser_widget)
         +Browser::apis apis
 
@@ -131,24 +120,25 @@ classDiagram
     }
 
     namespace gbw_Browser_classes {
-          class Webkit["gbw::browsers::webkit"] {
+          class Webkit["gbw::browsers::webkit"]:::gbw {
           +api environment_API()
           +api controller_API()
           +api core_API()
         }
-        class MsWebview2["gbw::browsers::mswebview2"] {
+        class MsWebview2["gbw::browsers::mswebview2"]:::gbw {
           +api environment_API()
           +api controller_API()
           +api core_API()
         }
-        class Chromium["gbw::browsers::chromium"] {
+        class Chromium["gbw::browsers::chromium"]:::gbw {
           +api environment_API()
           +api controller_API()
           +api core_API()
         }
     }
 
-    
+    classDef gbw fill:#FAE8FF; 
+    classDef other fill:#FFFFFF00
 ```
 
 
