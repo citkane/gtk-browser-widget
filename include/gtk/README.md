@@ -14,7 +14,7 @@ Header file that uses pragma guards to include the relevant browser engine class
 ```mermaid
 ---
 config:
-  theme: 'neutral'
+  theme: 'base'
   class:
     hideEmptyMembersBox: true
 ---
@@ -116,7 +116,7 @@ classDiagram
     }
 
 
-    note for Browser_engine "Pragma included from 'gtk/Browser_engine.hh'<br>Each 'browsers/*/*.hh' header aliases it's Browser class to 'gbw::browsers::Browser_engine'"
+    note for Browser_engine "Pragma included from 'gtk/Browser_engine.hh'<br>Each 'browsers/*/*.hh' header aliases it's Browser class to 'gbw::browsers::Browser_engine'" 
     class Browser_engine["gbw::browser::Browser_engine"]:::other {
         <<Aliased>>
         +Browser_engine(Browser_widget: *browser_widget)
@@ -155,19 +155,6 @@ classDiagram
     classDef gbw fill:#FCF5FF; 
     classDef other fill:#FFFFFF00
 ```
-
-
-
-
-
-    
-    
-
-    
-    
-
-    
-    
 
 ## `Gtk::Window`, `Gtk::Widget` and embedding
 Gtk >= 4 no longer supports embedding native windows within native windows. This leaves two options for embedding a browser engine window:
