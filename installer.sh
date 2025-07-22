@@ -12,15 +12,8 @@ INSTALL_DIR=$(pwd)/.dist
 PACKAGE_DIR=$(pwd)/.packages
 
 MSWEBVIEW_VERSION=1.0.3351.48
-MSWEBVIEW_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include
-MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64
-
-
-
 CHROMIUM_VERSION=138.0.17
-CHROMIUM_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include
-CHROMIUM_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64
-
+BROWSER_OPTIONS="<Chromium|MSWebView2>"
 SYS_OPTS=""
 
 PATH=$(cygpath -w /ucrt64/bin):$PATH
@@ -29,36 +22,7 @@ source ./.scripts/util.sh
 # For Windows, check that we are running in a MSYS2 UCRT environment
 check_env
 
-PACKAGE_INSTALL_HELP="\
-#  Installs required library packages.
-#  ATM only MSWEBVIEW2 on Windows is fully supported, so we leave this as basic logic.
-#  The installer currently supports CEF 
-#  @todo Expand the logic for multiple OS and embedded browser packages.
-## Usage:
-#   packages_install\
-"
 
-select_browser_caller() {
-    if [ "$(is_help "$@")" = true ]; then
-        print_help "$SELECT_BROWSER_HELP"
-        [ $PS1 ] && return 0 || exit 0
-    fi
-    if [[ -z "$1" ]]; then
-        throw_error "Browser type must be specified. Use: Chromium or MSWebView2"
-        return 1
-    fi
-    source ./.scripts/util.sh
-    select_browser "$1"
-
-}
-
-PACKAGE_INSTALL_HELP="\
-#  Installs required library packages.
-#  Supports both CEF (Chromium) and MS WebView2 browser engines.
-#  Browser must be selected first using select_browser command.
-## Usage:
-#   packages_install\
-"
 SELECT_BROWSER_HELP="\
 #  Selects the browser engine to use
 ## Options:
@@ -66,6 +30,27 @@ SELECT_BROWSER_HELP="\
 #      MSWebView2    Use Microsoft WebView2 (Windows only)
 ## Usage:
 #      select_browser <chromium|mswebview2>                               (required)
+"
+select_browser() {
+    if [ "$(is_help "$@")" = true ]; then
+        print_help "$SELECT_BROWSER_HELP"
+        [ $PS1 ] && return 0 || exit 0
+    fi
+    if [[ -z "$1" ]]; then
+        throw_error "Browser type must be specified: $BROWSER_OPTIONS"
+        return 1
+    fi
+    source ./.scripts/util.sh
+    select_browser_caller "$1"
+
+}
+
+PACKAGE_INSTALL_HELP="\
+#  Installs required library packages.
+#  ALPHA stage: Supports MsWebview2 and Chromium on Windows OS.
+
+## Usage:
+#   packages_install\
 "
 
 packages_install() {
@@ -77,7 +62,7 @@ packages_install() {
     if ! is_browser_selected; then
         return 1
     fi
-
+    verify_nuget
     if [ "$BROWSER" = "Chromium" ]; then
         install_cef
     elif [ "$BROWSER" = "MSWebView2" ]; then
@@ -210,8 +195,8 @@ $ source installer.sh   # Creates the installer session environment       (requi
 
 $ --help                # Prints help (this)
 $ select_browser        # Select browser engine (chromium or mswebview2)
-$ set_target            # Set compilation target file
 $ packages_install      # Installs required packages
+$ set_target            # Set compilation target file\
 $ generate              # Generate a clean build definition
 $ build                 # Builds the binary
 $ install               # Installs the built binary

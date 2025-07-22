@@ -63,33 +63,34 @@ is_generated() {
     fi
 }
 
-select_browser() {
+select_browser_caller() {
     local browser_engine="$1"
+    MSWEBVIEW_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include
+    MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64
+    CHROMIUM_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include
+    CHROMIUM_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64
 
     if [ "$browser_engine" = "Chromium" ]; then
         BROWSER="Chromium"
         BROWSER_INCLUDE_DIR="$CHROMIUM_INCLUDE_DIR"
         BROWSER_LIB_DIR="$CHROMIUM_LIB_DIR"
-        SYS_OPTS="-DCHROMIUM_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DCHROMIUM_LIB_DIR=$BROWSER_LIB_DIR"
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DBROWSER_LIB_DIR=$BROWSER_LIB_DIR -DBROWSER=$BROWSER"
     elif [ "$browser_engine" = "MSWebView2" ]; then
         BROWSER="MSWebView2"
         BROWSER_INCLUDE_DIR="$MSWEBVIEW_INCLUDE_DIR"
         BROWSER_LIB_DIR="$MSWEBVIEW_LIB_DIR"
-        SYS_OPTS="-DMSWEBVIEW_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DMSWEBVIEW_LIB_DIR=$BROWSER_LIB_DIR"
-    else
-        throw_error "Unsupported browser engine option: $browser_engine. Program will terminate."
-        return 1
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DBROWSER_LIB_DIR=$BROWSER_LIB_DIR -DBROWSER=$BROWSER"
     fi
 }
 is_browser_selected() {
     if [ -z "$BROWSER" ]; then
-        throw_error "A browser must be selected. Program will terminate."
+        throw_error "A browser must be selected. Please run \"select_browser $BROWSER_OPTIONS\"."
         return 1
     fi
     return 0
 }
 
-install_cef() {
+verify_nuget() {
     local nuget=$PACKAGE_DIR/bin/nuget.exe
     mkdir -p "$PACKAGE_DIR/bin"
 
@@ -97,18 +98,14 @@ install_cef() {
         curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
     fi
     
+
+}
+install_cef() {
     $nuget install chromiumembeddedframework.runtime -Version $CHROMIUM_VERSION -OutputDirectory "$PACKAGE_DIR"
     echo "CEF installed successfully"
 }
 
-install_mswebview2() {
-    local nuget=$PACKAGE_DIR/bin/nuget.exe
-    mkdir -p "$PACKAGE_DIR/bin"
-
-    if [ ! -f "$nuget" ]; then
-        curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-    fi
-    
+install_mswebview2() {    
     $nuget install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
     echo "MS WebView2 installed successfully"
 }
