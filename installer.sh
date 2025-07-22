@@ -17,15 +17,15 @@ MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/n
 
 
 
-CEF_VERSION=138.0.17
-CEF_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CEF_VERSION/build/native/include
-CEF_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CEF_VERSION/build/native/x64
+CHROMIUM_VERSION=138.0.17
+CHROMIUM_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include
+CHROMIUM_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64
 
 SYS_OPTS=""
 
 PATH=$(cygpath -w /ucrt64/bin):$PATH
 export PATH
-
+source ./.scripts/util.sh
 # For Windows, check that we are running in a MSYS2 UCRT environment
 check_env
 
@@ -118,6 +118,7 @@ generate() {
     rm -rf "$BUILD_DIR"
     # shellcheck disable=SC2086
     # shellcheck disable=SC2086
+
     cmake . -G "$BUILD_GENERATOR" -B "$BUILD_DIR" -S . \
         -DPROJECT_NAME=$PROJECT_NAME \
         -DBUILD_TARGET="$BUILD_TARGET" \

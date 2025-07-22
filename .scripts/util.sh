@@ -66,29 +66,29 @@ is_generated() {
 select_browser() {
     local browser_engine="$1"
 
-    if [$browser_engine="Chromium"]; then
+    if [ "$browser_engine" = "Chromium" ]; then
         BROWSER="Chromium"
         BROWSER_INCLUDE_DIR="$CHROMIUM_INCLUDE_DIR"
         BROWSER_LIB_DIR="$CHROMIUM_LIB_DIR"
-        SYS_OPTS="-DCHROMIUM_INCLUDE_DIR=$BROWSER_INCLUDE_DIR \
-    elif [$browser_engine="MSWebView2"]; then
-        BROWSER="MSWebView"
+        SYS_OPTS="-DCHROMIUM_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DCHROMIUM_LIB_DIR=$BROWSER_LIB_DIR"
+    elif [ "$browser_engine" = "MSWebView2" ]; then
+        BROWSER="MSWebView2"
         BROWSER_INCLUDE_DIR="$MSWEBVIEW_INCLUDE_DIR"
         BROWSER_LIB_DIR="$MSWEBVIEW_LIB_DIR"
-        SYS_OPTS="-DMSWEBVIEW_INCLUDE_DIR=$BROWSER_INCLUDE_DIR \
+        SYS_OPTS="-DMSWEBVIEW_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DMSWEBVIEW_LIB_DIR=$BROWSER_LIB_DIR"
     else
         throw_error "Unsupported browser engine option: $browser_engine. Program will terminate."
         return 1
     fi
 }
-
 is_browser_selected() {
-    if [-z "$BROWSER"]; then
+    if [ -z "$BROWSER" ]; then
         throw_error "A browser must be selected. Program will terminate."
         return 1
     fi
     return 0
 }
+
 install_cef() {
     local nuget=$PACKAGE_DIR/bin/nuget.exe
     mkdir -p "$PACKAGE_DIR/bin"
@@ -97,7 +97,7 @@ install_cef() {
         curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
     fi
     
-    $nuget install chromiumembeddedframework.runtime -Version $CEF_VERSION -OutputDirectory "$PACKAGE_DIR"
+    $nuget install chromiumembeddedframework.runtime -Version $CHROMIUM_VERSION -OutputDirectory "$PACKAGE_DIR"
     echo "CEF installed successfully"
 }
 
