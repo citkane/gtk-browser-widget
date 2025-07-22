@@ -62,8 +62,8 @@ PACKAGE_INSTALL_HELP="\
 SELECT_BROWSER_HELP="\
 #  Selects the browser engine to use
 ## Options:
-#      chromium      Use Chromium Embedded Framework (CEF)
-#      mswebview2    Use Microsoft WebView2 (Windows only)
+#      Chromium      Use Chromium Embedded Framework (CEF)
+#      MSWebView2    Use Microsoft WebView2 (Windows only)
 ## Usage:
 #      select_browser <chromium|mswebview2>                               (required)
 "
