@@ -106,6 +106,7 @@ GBW is developed in C++, but will aim to provide bindings for other GTK supporte
 
 Support for the following languages is planned:
 
+
 - C
 - JavaScript
 - Perl
