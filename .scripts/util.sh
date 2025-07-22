@@ -5,7 +5,8 @@
 BROWSER=""
 BROWSER_INCLUDE_DIR=""
 BROWSER_LIB_DIR=""
-
+# Define globally since used in multiple functions
+nuget=$PACKAGE_DIR/bin/nuget.exe
 set_build_type() {
     for arg in "$@"; do
         if [[ "$arg" == "Debug" || "$arg" == "Release" || "$arg" == "RelWithDebInfo" ]]; then
@@ -91,7 +92,7 @@ is_browser_selected() {
 }
 
 verify_nuget() {
-    local nuget=$PACKAGE_DIR/bin/nuget.exe
+    
     mkdir -p "$PACKAGE_DIR/bin"
 
     if [ ! -f "$nuget" ]; then

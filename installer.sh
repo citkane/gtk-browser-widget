@@ -103,7 +103,7 @@ generate() {
     rm -rf "$BUILD_DIR"
     # shellcheck disable=SC2086
     # shellcheck disable=SC2086
-
+    echo "Sysopts are: $SYS_OPTS"
     cmake . -G "$BUILD_GENERATOR" -B "$BUILD_DIR" -S . \
         -DPROJECT_NAME=$PROJECT_NAME \
         -DBUILD_TARGET="$BUILD_TARGET" \
