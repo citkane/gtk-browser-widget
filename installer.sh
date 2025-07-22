@@ -26,35 +26,68 @@ SYS_OPTS=""
 PATH=$(cygpath -w /ucrt64/bin):$PATH
 export PATH
 
-source ./.scripts/util.sh
 # For Windows, check that we are running in a MSYS2 UCRT environment
 check_env
 
 PACKAGE_INSTALL_HELP="\
 #  Installs required library packages.
 #  ATM only MSWEBVIEW2 on Windows is fully supported, so we leave this as basic logic.
-#  The installer currently supports CEF
-#  @todo Expand the logic for mutiple OS and embedded browser packages.
+#  The installer currently supports CEF 
+#  @todo Expand the logic for multiple OS and embedded browser packages.
 ## Usage:
 #   packages_install\
 "
+
+select_browser_caller() {
+    if [ "$(is_help "$@")" = true ]; then
+        print_help "$SELECT_BROWSER_HELP"
+        [ $PS1 ] && return 0 || exit 0
+    fi
+    if [[ -z "$1" ]]; then
+        throw_error "Browser type must be specified. Use: Chromium or MSWebView2"
+        return 1
+    fi
+    source ./.scripts/util.sh
+    select_browser "$1"
+
+}
+
+PACKAGE_INSTALL_HELP="\
+#  Installs required library packages.
+#  Supports both CEF (Chromium) and MS WebView2 browser engines.
+#  Browser must be selected first using select_browser command.
+## Usage:
+#   packages_install\
+"
+SELECT_BROWSER_HELP="\
+#  Selects the browser engine to use
+## Options:
+#      chromium      Use Chromium Embedded Framework (CEF)
+#      mswebview2    Use Microsoft WebView2 (Windows only)
+## Usage:
+#      select_browser <chromium|mswebview2>                               (required)
+"
+
 packages_install() {
     if [ "$(is_help "$@")" = true ]; then
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
 
-    local nuget=$PACKAGE_DIR/bin/nuget.exe
-    mkdir -p "$PACKAGE_DIR/bin"
-
-    if [ ! -f "$nuget" ]; then
-        curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+    if ! is_browser_selected; then
+        return 1
     fi
-    $nuget install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
-    # Provide CEF support via the runtime: https://www.nuget.org/packages/chromiumembeddedframework.runtime
-    $nuget install chromiumembeddedframework.runtime -Version $CEF_VERSION -OutputDirectory "$PACKAGE_DIR"
 
+    if [ "$BROWSER" = "Chromium" ]; then
+        install_cef
+    elif [ "$BROWSER" = "MSWebView2" ]; then
+        install_mswebview2
+    else
+        throw_error "Unsupported browser engine: $BROWSER. Program will terminate."
+        return 1
+    fi
 }
+
 
 SET_TARGET_HELP="\
 #  Sets the path to the compilation target
@@ -79,7 +112,11 @@ generate() {
         return 1 
     fi
 
+    if ! is_browser_selected; then
+        return 1
+    fi
     rm -rf "$BUILD_DIR"
+    # shellcheck disable=SC2086
     # shellcheck disable=SC2086
     cmake . -G "$BUILD_GENERATOR" -B "$BUILD_DIR" -S . \
         -DPROJECT_NAME=$PROJECT_NAME \
@@ -171,6 +208,8 @@ Basic usage:
 $ source installer.sh   # Creates the installer session environment       (required)
 
 $ --help                # Prints help (this)
+$ select_browser        # Select browser engine (chromium or mswebview2)
+$ set_target            # Set compilation target file
 $ packages_install      # Installs required packages
 $ generate              # Generate a clean build definition
 $ build                 # Builds the binary
@@ -181,6 +220,14 @@ $ <command> <-h --help> # Prints help for the command
 
 Advanced usage:
 ------------------------------------------------------------------------------------
+## select_browser: ################################################################
+$SELECT_BROWSER_HELP
+####################################################################################
+
+## set_target: ####################################################################
+$SET_TARGET_HELP
+####################################################################################
+
 ## packages_install: ###############################################################
 $PACKAGE_INSTALL_HELP
 ####################################################################################
