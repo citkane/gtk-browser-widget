@@ -1,0 +1,124 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2025 Michael Jonker
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#ifndef GBW_OS_LIB_LIB_OS_HH
+#define GBW_OS_LIB_LIB_OS_HH
+
+#include "browsers/lib/Lib_browser.hh"
+#include "types/types.hh"
+
+using namespace gbw::browsers;
+namespace gbw::os {
+
+class Lib_os : protected Lib_browser {
+
+public:
+  virtual ~Lib_os() = 0;
+  Lib_os() {};
+
+protected:
+  struct os_api_window_size_t : nested_api_t<Os> {
+    os_api_window_size_t(Os *self) : nested_api_t(self) {};
+
+    /// Gets pixel size for the top level native window
+    virtual dimension_t top_level(float dpi_scale) = 0;
+    /// Gets pixel size for the browser native window
+    virtual dimension_t browser(float dpi_scale) = 0;
+    /// Gets pixel size for the given native window
+    virtual dimension_t get(native_window_t &native_window,
+                            float dpi_scale) = 0;
+  };
+
+  struct os_api_layout_t : nested_api_t<Os> {
+    os_api_layout_t(Os *self) : nested_api_t(self) {};
+
+    /// Gets the pixel layout for the given native window relative to the screen
+    virtual layout_t get(native_window_t &native_window) = 0;
+
+    /// Moves the native browser window to the new pixel origin relative to the
+    /// screen
+    virtual void move_browser(layout_t &new_layout) = 0;
+  };
+
+  struct os_api_window_t : nested_api_t<Os> {
+    os_api_window_t(Os *self, os_api_window_size_t *size)
+        : nested_api_t(self), size(*size) {};
+
+    /// Converts a `Gtk::Window` to an OS native window
+    /// @throws exception if conversion fails.
+    virtual native_window_t convert_gtk_to_native(gtk_window_t &window) = 0;
+
+    /// Gets the dpi scale for the given native window
+    virtual float get_dpi_scale(native_window_t &native_window) = 0;
+
+    /// Gets the top left pixel position for the given native window
+    virtual position_t get_position(native_window_t &native_window,
+                                    float dpi_scale) = 0;
+
+    os_api_window_size_t &size;
+  };
+
+  struct os_api_t : nested_api_t<Lib_os> {
+    os_api_t(Lib_os *self, os_api_window_t *window, os_api_layout_t *layout)
+        : nested_api_t(self), window(*window), layout(*layout) {};
+
+    /// OS API for working with native windows
+    os_api_window_t &window;
+
+    /// OS API for working with native window layouts
+    os_api_layout_t &layout;
+
+    /// Sets the native OS top level and browser windows for the corresponding
+    /// `Gtk::Window`s
+    void set_native_windows(gtk_window_t &top_level, gtk_window_t &browser) {
+      self->top_level_window = window.convert_gtk_to_native(top_level);
+      self->browser_window = window.convert_gtk_to_native(browser);
+    }
+
+    /// Get the top level native OS window object
+    native_window_t get_top_level_window() {
+      if (!self->top_level_window) {
+        throw GBW_error("Top level native window was not set");
+      }
+      return self->top_level_window;
+    }
+
+    /// Get the browser native OS window object
+    native_window_t get_browser_window() {
+      if (!self->browser_window) {
+        throw GBW_error("Browser native window was not set");
+      }
+      return self->browser_window;
+    }
+  };
+
+private:
+  native_window_t top_level_window;
+  native_window_t browser_window;
+};
+
+inline Lib_os::~Lib_os() {}
+} // namespace gbw::os
+
+#endif // GBW_OS_LIB_LIB_OS_HH

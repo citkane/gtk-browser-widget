@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_OS_INCLUDES_HH
-#define EBW_OS_INCLUDES_HH
+#ifndef GBW_BROWSERS_TYPES_INCLUDES_HH
+#define GBW_BROWSERS_TYPES_INCLUDES_HH
 
-#ifdef _WIN32
-#include "os/windows/Lib_win.hh" // IWYU pragma: keep
-#endif
+#ifdef GBW_MSWEBVIEW2
+#include "browsers/mswebview2/types/types_wv2.hh" // IWYU pragma: keep
+using namespace gbw::browsers::mswebview2;
+#endif // GBW_MSWEBVIEW2
 
-using namespace gbw::os;
-#endif // EBW_OS_INCLUDES_HH
+#endif // GBW_BROWSERS_TYPES_INCLUDES_HH

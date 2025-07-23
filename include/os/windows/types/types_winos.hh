@@ -22,14 +22,17 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
-#define EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
+#ifndef GBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
+#define GBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
 #ifdef _WIN32
 
 #include <Unknwn.h>
 #include <gdk/win32/gdkwin32.h>
 
-namespace gbw::os::windows {
+namespace gbw::os {
+namespace windows {
+class Windows;
+
 using native_window_t = HWND;
 /// A replacement for the MSVC only wil::com_ptr smart pointer
 /// @see https://github.com/microsoft/wil/wiki/WinRT-and-COM-wrappers
@@ -112,7 +115,9 @@ public:
   }
 };
 
-} // namespace gbw::os::windows
+} // namespace windows
+using Os = gbw::os::windows::Windows;
+} // namespace gbw::os
 
 #endif // _WIN32
-#endif // EBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH
+#endif // GBW_OS_WINDOWS_TYPES_TYPES_WINOS_HH

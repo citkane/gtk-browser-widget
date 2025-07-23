@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
-#define EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+#ifndef GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+#define GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
 
 #include "types/types.hh" // IWYU pragma: keep
 
@@ -59,4 +59,4 @@ private:
 
 } // namespace lib_mswebview2
 } // namespace gbw::browsers::mswebview2
-#endif // EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+#endif // GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH

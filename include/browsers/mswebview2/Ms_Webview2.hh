@@ -30,51 +30,66 @@
  *                                                                           *
  *****************************************************************************/
 
-#ifndef EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
-#define EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
-#if defined(_WIN32) && defined(EBW_MSWEBVIEW2)
+#ifndef GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
+#define GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
+#if defined(_WIN32) && defined(GBW_MSWEBVIEW2)
 
 #include "browsers/mswebview2/lib/Controller.hh"
 #include "browsers/mswebview2/lib/Environment.hh"
-#include "gtk/Browser_window.hh"
+#include "core/lib/Lib_gbw.hh"
 #include "types/types.hh"
 
-using namespace gbw::os::windows;
-
-namespace gbw {
-namespace browsers::mswebview2 {
+using namespace gbw::core::lib;
+namespace gbw::browsers::mswebview2 {
 
 class Ms_Webview2 : lib_mswebview2::Environment,
                     lib_mswebview2::Controller,
-                    public gtk::Browser_window {
-public:
-  ~Ms_Webview2() override;
-  Ms_Webview2(gbw_widget_t *widget);
+                    protected Lib_gbw {
 
-protected:
-  /// @copydoc gtk::Browser_window::browser_get_core_imp
-  smart_core_t &browser_get_core_impl() override;
-  /// @copydoc gtk::Browser_window::browser_get_controller_impl
-  smart_control_t &browser_get_controller_impl() override;
-  /// @copydoc gtk::Browser_window::browser_engine_init_impl
-  void browser_engine_init_impl() override;
-  /// @copydoc gtk::Browser_window::browser_ready_imp
-  ready_signal_t &browser_ready_impl() override {
-    return browser_ready_signal;
+  struct mswebview_api_layout_t : browser_api_layout_t {
+    mswebview_api_layout_t(Ms_Webview2 *self) : browser_api_layout_t(self) {};
+
+    void fit(layout_t &layout) override;
   };
 
+  struct mswebview_api_signals_t : browser_api_signals_t {
+    mswebview_api_signals_t(Ms_Webview2 *self) : browser_api_signals_t(self) {}
+
+    ready_signal_t &core_ready() override;
+    ready_signal_t &env_ready() override;
+    ready_signal_t &controller_ready() override;
+  };
+
+  struct mswebview_api_api_t : browser_api_api_t {
+    mswebview_api_api_t(Ms_Webview2 *self) : browser_api_api_t(self) {};
+
+    smart_core_t &core() override;
+
+    smart_control_t &controller() override;
+
+    smart_env_t &environment() override;
+  };
+
+  struct mswebview_api_t : browser_api_t {
+    mswebview_api_t(Ms_Webview2 *self)
+        : browser_api_t(self, &self->mswebview_api_api,
+                        &self->mswebview_api_layout,
+                        &self->mswebview_api_signals) {};
+
+    void init() override;
+  };
+
+public:
+  virtual ~Ms_Webview2() = 0;
+  Ms_Webview2(gbw_widget_t *widget, gbw_browser_t *engine);
+
+protected:
+  mswebview_api_t browser;
+
 private:
-  gdk_bounds_t bounds;
-
-  smart_env_t browser_environment;
-  smart_control_t browser_control;
-  smart_core_t browser_core;
-
-  ready_signal_t browser_environment_ready;
-  ready_signal_t browser_ready_signal;
-
-  HWND browser_hWnd;
-  HWND top_level_hWnd;
+  mswebview_api_api_t mswebview_api_api;
+  mswebview_api_layout_t mswebview_api_layout;
+  mswebview_api_signals_t mswebview_api_signals;
 
   void set_browser_env(browser_env_t &environment);
   void set_browser_controller(browser_controller_t &controller);
@@ -90,16 +105,15 @@ private:
   /// UI changes and then natively pass them to pseudo-children.
   ///
   /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
-  bool layout_update_cb();
-  void fit_browser_to_window(LONG x, LONG y, LONG width, LONG height);
+  // bool layout_update_cb();
+
+  // void fit_browser_to_window(LONG x, LONG y, LONG width, LONG height);
 
   friend class lib_mswebview2::Environment;
   friend class lib_mswebview2::Controller;
 };
 
-} // namespace browsers::mswebview2
-using Browser_engine = gbw::browsers::mswebview2::Ms_Webview2;
-} // namespace gbw
+} // namespace gbw::browsers::mswebview2
 
 #endif // _WIN32
-#endif // EBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
+#endif // GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH

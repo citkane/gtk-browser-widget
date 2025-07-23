@@ -19,23 +19,22 @@ config:
     hideEmptyMembersBox: true
 ---
 classDiagram
-    Browser_widget *-- User_application
+    Browser_widget --* User_application
     User_application <|-- Application
 
-    Browser_engine ()..() Webkit : or
-    Browser_engine ()..() Chromium : or
-    Browser_engine ()..() MsWebview2 : or
-    Browser_engine --* Browser_widget
-    Browser_engine *.. Browser_widget : *widget
-
-    Webkit <|-- Browser_window
-    Chromium <|-- Browser_window
-    MsWebview2 <|-- Browser_window
-    
     Browser_widget <|-- Widget
     Browser_window <|-- Window
     
-    Browser_window <|-- Lib_gtk
+    Browser_widget *--* Browser_window : *browser_window<br>*browser_widget
+
+    Webkit <|-- Lib_gtk
+    Chromium <|-- Lib_gtk
+    MsWebview2 <|-- Lib_gtk
+
+    Browser_window <|-- Webkit  : or
+    Browser_window <|-- Chromium : or
+    Browser_window <|-- MsWebview2 : or
+
     Lib_gtk <|-- Lib_win : or
     Lib_gtk <|-- Lib_mac : or
     Lib_gtk <|-- Lib_linux : or
@@ -45,6 +44,15 @@ classDiagram
     Lib_linux <|-- Lib_os
     Lib_os <|-- Lib_browser
     
+    namespace Gtk {
+      class Widget["Gtk::Widget"]:::other {
+        #Gtk::Widget methods()
+      }
+      class Window["Gtk::Window"]:::other {
+        #Gtk::Window methods()
+      }
+    }
+
     namespace User_entry {
       class Application["Gtk::Application"]:::other
       class User_application:::other {
@@ -104,25 +112,6 @@ classDiagram
         #Browser methods()
         #virtual_OS impls()*
       }
-    }
-
-    namespace Gtk {
-      class Widget["Gtk::Widget"]:::other {
-        #Gtk::Widget methods()
-      }
-      class Window["Gtk::Window"]:::other {
-        #Gtk::Window methods()
-      }
-    }
-
-
-    note for Browser_engine "Pragma included from 'gtk/Browser_engine.hh'<br>Each 'browsers/*/*.hh' header aliases it's Browser class to 'gbw::browsers::Browser_engine'" 
-    class Browser_engine["gbw::browser::Browser_engine"]:::other {
-        <<Aliased>>
-        +Browser_engine(Browser_widget: *browser_widget)
-        +Browser::apis apis
-        -Browser::apis init_browser()
-        
     }
 
     namespace gbw_Browser_classes {
