@@ -103,3 +103,13 @@ Provides an easy to consume interface that binds native callback functions to br
 
 ## Language Bindings (todo)
 GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
+
+We plan to support the following languages:
+
+- C
+- JavaScript
+- Perl
+- Python
+- Rust
+- Vala 
+- C# (via Gir.Core)

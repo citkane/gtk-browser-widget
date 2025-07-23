@@ -2,8 +2,8 @@
 /.dist
 /.packages
 /.cache
-/.vscode
 /.cspell
+/.vscode
 
 compile_commands.json
 /*.cc
