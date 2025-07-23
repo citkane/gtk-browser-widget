@@ -28,8 +28,6 @@ add_executable(${PROJECT_NAME} ${BUILD_TARGET} ${SRCS})
 set_browser_definition()
 set_browser_linked_lib()
 
-message(STATUS ${BROWSER_INCLUDE_DIR})
-
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${GTKMM_INCLUDE_DIRS}

@@ -11,8 +11,8 @@ BUILD_TARGET=""
 INSTALL_DIR=$(pwd)/.dist
 PACKAGE_DIR=$(pwd)/.packages
 
-MSWEBVIEW_VERSION=1.0.3351.48
-CHROMIUM_VERSION=138.0.17
+MSWEBVIEW_NUGET_V=1.0.3351.48
+CHROMIUM_NUGET_V=138.0.17
 BROWSER_OPTIONS="<chromium|mswebview2>"
 SYS_OPTS=""
 
@@ -27,7 +27,7 @@ SELECT_BROWSER_HELP="\
 #  Selects the browser engine to use
 ## Options:
 #      chromium                                                 Use Chromium Embedded Framework (CEF)
-#      mswebview2                                           Use Microsoft WebView2 (Windows only)
+#      mswebview2                                               Use Microsoft WebView2 (Windows only)
 ## Default:
 #      chromium
 ## Usage:
@@ -56,18 +56,12 @@ packages_install() {
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
-    if [ -z $BROWSER ]; then
-        select_browser
-    fi
+    select_browser
     verify_nuget
     if [ "$BROWSER" = "chromium" ]; then
         install_cef
     elif [ "$BROWSER" = "mswebview2" ]; then
         install_mswebview2
-    else
-        throw_error "Unsupported browser engine: $BROWSER. Program will terminate."
-        return 1
-    fi
 }
 
 
@@ -93,10 +87,12 @@ generate() {
     if ! is_target_file_set; then 
         return 1 
     fi
+    if [ -z $BROWSER ]; then 
+        select_browser
+    fi
 
 
     rm -rf "$BUILD_DIR"
-    # shellcheck disable=SC2086
     # shellcheck disable=SC2086
     cmake . -G "$BUILD_GENERATOR" -B "$BUILD_DIR" -S . \
         -DPROJECT_NAME=$PROJECT_NAME \
@@ -187,7 +183,7 @@ Basic usage:
 $ source installer.sh   # Creates the installer session environment       (required)
 
 $ --help                # Prints help (this)
-$ select_browser        # Select browser engine (chromium or mswebview2)
+$ select_browser        # Select browser engine
 $ packages_install      # Installs required packages
 $ set_target            # Set compilation target file
 $ generate              # Generate a clean build definition
