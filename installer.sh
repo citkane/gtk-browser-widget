@@ -56,7 +56,9 @@ packages_install() {
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
-    if [ -z $BROWSER ]; then select_browser fi
+    if [ -z $BROWSER ]; then
+        select_browser
+    fi
     verify_nuget
     if [ "$BROWSER" = "chromium" ]; then
         install_cef
@@ -170,8 +172,7 @@ run() {
     local executable=$INSTALL_DIR/bin/$PROJECT_NAME.exe
     if [ ! -f "$executable" ]; then
         install "$@"
-    
-
+    fi
     $executable
 }
 

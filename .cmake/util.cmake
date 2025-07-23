@@ -44,30 +44,15 @@ function (set_browser_definition)
 endfunction()
 
 function (set_browser_linked_lib)
-    # Determine which browser is active
-    set(active_browser "")
-    foreach(browser IN LISTS BROWSERS)
-        if(DEFINED "${browser}")
-            set(active_browser "${browser}")
-            break()
-        endif()
-    endforeach()
-    
-    # Set default browser to Chromium if none defined
-    if("${active_browser}" STREQUAL "")
-        set(active_browser "chromium")
-    endif()
     if(WIN32)
-        if("${active_browser}" STREQUAL "MSWEBVIEW2")
+        if("${BROWSER}" STREQUAL "mswebview2")
             set(BROWSER_LINKED_LIB "WebView2Loader.dll" PARENT_SCOPE)
-        elseif("${active_browser}" STREQUAL "CHROMIUM")
+        elseif("${BROWSER}" STREQUAL "chromium")
             set(BROWSER_LINKED_LIB "chromium.dll" PARENT_SCOPE)
         endif()
     elseif(APPLE)
-        pass
+        # Placeholder for Mac logic
     else() # Linux
-        elseif("${active_browser}" STREQUAL "CHROMIUM")
-            set(BROWSER_LINKED_LIB "libchromium.so" PARENT_SCOPE)
-        endif()
+        # Placeholder for Linux logic
     endif()
 endfunction()
