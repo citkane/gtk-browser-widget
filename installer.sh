@@ -62,6 +62,7 @@ packages_install() {
         install_cef
     elif [ "$BROWSER" = "mswebview2" ]; then
         install_mswebview2
+    fi
 }
 
 

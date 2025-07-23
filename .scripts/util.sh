@@ -64,16 +64,23 @@ is_generated() {
 }
 
 select_browser_caller() {
-    if [ "$1" = "chromium" ]; then
+    if [[ "$1" = "chromium" || "$BROWSER" = "chromium" ]]; then
         BROWSER="chromium"
-        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64 -DBROWSER=$BROWSER"
-    elif [ "$1" = "mswebview2" ]; then
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include\
+        -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64\
+        -DBROWSER=$BROWSER"
+    elif [[ "$1" = "mswebview2" || "$BROWSER" = "mswebview2" ]]; then
         BROWSER="mswebview2"
-        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/x64 -DBROWSER=$BROWSER"
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/include\
+        -DBROWSER_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/x64\
+        -DBROWSER=$BROWSER"
     else
         # Handle both empty and invalid input in one condition
         throw_error "Invalid input: $1. Resorting to default browser: Chromium"
-        select_browser_caller "chromium"
+        BROWSER="chromium"
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64 -DBROWSER=$BROWSER"
     fi
 }
 
