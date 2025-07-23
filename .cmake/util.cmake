@@ -21,7 +21,7 @@ function (set_browser_definition)
     endif()
     # Proceed if only one embedded browser has been defined
     if("${count}" GREATER 0)
-        # Throw fatal error if MSWEBVIEW2 is defined for a non Winidows OS
+        # Throw fatal error if MSWEBVIEW2 is defined for a non Windows OS
         if(MSWEBVIEW2 AND NOT WIN32)
             message(FATAL_ERROR "MSWEBVIEW2 is only available on the Windows operating system")
         endif()
@@ -40,5 +40,34 @@ function (set_browser_definition)
         target_compile_definitions(${PROJECT_NAME} PRIVATE EBW_MSWEBVIEW2=ON)
     else()
         target_compile_definitions(${PROJECT_NAME} PRIVATE EBW_WEBKIT=ON)
+    endif()
+endfunction()
+
+function (set_browser_linked_lib)
+    # Determine which browser is active
+    set(active_browser "")
+    foreach(browser IN LISTS BROWSERS)
+        if(DEFINED "${browser}")
+            set(active_browser "${browser}")
+            break()
+        endif()
+    endforeach()
+    
+    # Set default browser to Chromium if none defined
+    if("${active_browser}" STREQUAL "")
+        set(active_browser "chromium")
+    endif()
+    if(WIN32)
+        if("${active_browser}" STREQUAL "MSWEBVIEW2")
+            set(BROWSER_LINKED_LIB "WebView2Loader.dll" PARENT_SCOPE)
+        elseif("${active_browser}" STREQUAL "CHROMIUM")
+            set(BROWSER_LINKED_LIB "chromium.dll" PARENT_SCOPE)
+        endif()
+    elseif(APPLE)
+        pass
+    else() # Linux
+        elseif("${active_browser}" STREQUAL "CHROMIUM")
+            set(BROWSER_LINKED_LIB "libchromium.so" PARENT_SCOPE)
+        endif()
     endif()
 endfunction()

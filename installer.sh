@@ -13,7 +13,7 @@ PACKAGE_DIR=$(pwd)/.packages
 
 MSWEBVIEW_VERSION=1.0.3351.48
 CHROMIUM_VERSION=138.0.17
-BROWSER_OPTIONS="<Chromium|MSWebView2>"
+BROWSER_OPTIONS="<chromium|mswebview2>"
 SYS_OPTS=""
 
 PATH=$(cygpath -w /ucrt64/bin):$PATH
@@ -26,21 +26,19 @@ check_env
 SELECT_BROWSER_HELP="\
 #  Selects the browser engine to use
 ## Options:
-#      Chromium      Use Chromium Embedded Framework (CEF)
-#      MSWebView2    Use Microsoft WebView2 (Windows only)
+#      chromium                                                 Use Chromium Embedded Framework (CEF)
+#      mswebview2                                           Use Microsoft WebView2 (Windows only)
+## Default:
+#      chromium
 ## Usage:
-#      select_browser <chromium|mswebview2>                               (required)
+#      select_browser $BROWSER_OPTIONS                          
 "
 select_browser() {
     if [ "$(is_help "$@")" = true ]; then
         print_help "$SELECT_BROWSER_HELP"
         [ $PS1 ] && return 0 || exit 0
     fi
-    if [[ -z "$1" ]]; then
-        throw_error "Browser type must be specified: $BROWSER_OPTIONS"
-        return 1
-    fi
-    source ./.scripts/util.sh
+
     select_browser_caller "$1"
 
 }
@@ -50,7 +48,7 @@ PACKAGE_INSTALL_HELP="\
 #  ALPHA stage: Supports MsWebview2 and Chromium on Windows OS.
 
 ## Usage:
-#   packages_install\
+#   packages_install
 "
 
 packages_install() {
@@ -58,14 +56,11 @@ packages_install() {
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
-
-    if ! is_browser_selected; then
-        return 1
-    fi
+    if [ -z $BROWSER ]; then select_browser fi
     verify_nuget
-    if [ "$BROWSER" = "Chromium" ]; then
+    if [ "$BROWSER" = "chromium" ]; then
         install_cef
-    elif [ "$BROWSER" = "MSWebView2" ]; then
+    elif [ "$BROWSER" = "mswebview2" ]; then
         install_mswebview2
     else
         throw_error "Unsupported browser engine: $BROWSER. Program will terminate."
@@ -97,13 +92,10 @@ generate() {
         return 1 
     fi
 
-    if ! is_browser_selected; then
-        return 1
-    fi
+
     rm -rf "$BUILD_DIR"
     # shellcheck disable=SC2086
     # shellcheck disable=SC2086
-    echo "Sysopts are: $SYS_OPTS"
     cmake . -G "$BUILD_GENERATOR" -B "$BUILD_DIR" -S . \
         -DPROJECT_NAME=$PROJECT_NAME \
         -DBUILD_TARGET="$BUILD_TARGET" \
@@ -178,7 +170,7 @@ run() {
     local executable=$INSTALL_DIR/bin/$PROJECT_NAME.exe
     if [ ! -f "$executable" ]; then
         install "$@"
-    fi
+    
 
     $executable
 }
@@ -196,7 +188,7 @@ $ source installer.sh   # Creates the installer session environment       (requi
 $ --help                # Prints help (this)
 $ select_browser        # Select browser engine (chromium or mswebview2)
 $ packages_install      # Installs required packages
-$ set_target            # Set compilation target file\
+$ set_target            # Set compilation target file
 $ generate              # Generate a clean build definition
 $ build                 # Builds the binary
 $ install               # Installs the built binary

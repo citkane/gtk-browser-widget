@@ -5,8 +5,7 @@
 BROWSER=""
 BROWSER_INCLUDE_DIR=""
 BROWSER_LIB_DIR=""
-# Define globally since used in multiple functions
-nuget=$PACKAGE_DIR/bin/nuget.exe
+NUGET=$PACKAGE_DIR/bin/nuget.exe
 set_build_type() {
     for arg in "$@"; do
         if [[ "$arg" == "Debug" || "$arg" == "Release" || "$arg" == "RelWithDebInfo" ]]; then
@@ -65,49 +64,40 @@ is_generated() {
 }
 
 select_browser_caller() {
-    local browser_engine="$1"
-    MSWEBVIEW_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include
-    MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64
-    CHROMIUM_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include
-    CHROMIUM_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64
+    if [ -z "$1" ]; then
+        BROWSER="chromium"
+        echo "The default browser '$BROWSER' was selected as no option was selected manually."
+    elif [ "$1" = "chromium" ]; then
+        BROWSER="chromium"
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64 -DBROWSER=$BROWSER"
+    elif [ "$1" = "mswebview2" ]; then
+        BROWSER="mswebview2"
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64 -DBROWSER=$BROWSER"
+    else
+        throw_error "Unsupported browser engine option: $1. Chromium will be selected."
+        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/include -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_VERSION/build/native/x64 -DBROWSER=$BROWSER"
+    fi
+}
 
-    if [ "$browser_engine" = "Chromium" ]; then
-        BROWSER="Chromium"
-        BROWSER_INCLUDE_DIR="$CHROMIUM_INCLUDE_DIR"
-        BROWSER_LIB_DIR="$CHROMIUM_LIB_DIR"
-        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DBROWSER_LIB_DIR=$BROWSER_LIB_DIR -DBROWSER=$BROWSER"
-    elif [ "$browser_engine" = "MSWebView2" ]; then
-        BROWSER="MSWebView2"
-        BROWSER_INCLUDE_DIR="$MSWEBVIEW_INCLUDE_DIR"
-        BROWSER_LIB_DIR="$MSWEBVIEW_LIB_DIR"
-        SYS_OPTS="-DBROWSER_INCLUDE_DIR=$BROWSER_INCLUDE_DIR -DBROWSER_LIB_DIR=$BROWSER_LIB_DIR -DBROWSER=$BROWSER"
-    fi
-}
-is_browser_selected() {
-    if [ -z "$BROWSER" ]; then
-        throw_error "A browser must be selected. Please run \"select_browser $BROWSER_OPTIONS\"."
-        return 1
-    fi
-    return 0
-}
+
 
 verify_nuget() {
     
     mkdir -p "$PACKAGE_DIR/bin"
 
-    if [ ! -f "$nuget" ]; then
-        curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+    if [ ! -f "$NUGET" ]; then
+        curl -o "$NUGET" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
     fi
     
 
 }
 install_cef() {
-    $nuget install chromiumembeddedframework.runtime -Version $CHROMIUM_VERSION -OutputDirectory "$PACKAGE_DIR"
+    $NUGET install chromiumembeddedframework.runtime -Version $CHROMIUM_VERSION -OutputDirectory "$PACKAGE_DIR"
     echo "CEF installed successfully"
 }
 
 install_mswebview2() {    
-    $nuget install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
+    $NUGET install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
     echo "MS WebView2 installed successfully"
 }
 

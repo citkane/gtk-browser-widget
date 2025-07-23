@@ -26,6 +26,7 @@ pkg_check_modules(GTKMM gtkmm-4.0)
 add_executable(${PROJECT_NAME} ${BUILD_TARGET} ${SRCS})
 
 set_browser_definition()
+set_browser_linked_lib()
 
 message(STATUS ${BROWSER_INCLUDE_DIR})
 
@@ -44,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(FILES
-    ${BROWSER_LIB_DIR}/WebView2Loader.dll
+    ${BROWSER_LIB_DIR}/${BROWSER_LINKED_LIB}
     DESTINATION bin
 )
 
