@@ -56,7 +56,11 @@ packages_install() {
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
-    select_browser
+
+    if [ -z $BROWSER ]; then 
+        select_browser
+    fi
+    
     verify_nuget
     if [ "$BROWSER" = "chromium" ]; then
         install_cef
