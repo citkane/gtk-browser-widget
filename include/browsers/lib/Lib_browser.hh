@@ -110,15 +110,3 @@ inline Lib_browser::~Lib_browser() {}
 } // namespace gbw::browsers
 
 #endif // GBW_BROWSERS_LIB_LIB_BROWSER_HH
-
-//  ready_signal_t &get_environment_ready_signal() {
-//    return environment_ready_signal;
-//  };
-//  ready_signal_t &get_controller_ready_signal() {
-//    return controller_ready_signal;
-//  };
-//  ready_signal_t &get_core_ready_signal() { return core_ready_signal; };
-
-// smart_env_t &get_api_environment() { return api_environment; }
-// smart_control_t &get_api_controller() { return api_controller; }
-// smart_core_t &get_api_core() { return api_core; }

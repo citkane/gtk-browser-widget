@@ -109,19 +109,3 @@ private:
 } // namespace gbw::os
 
 #endif // GBW_OS_LIB_LIB_OS_HH
-
-//    /// Get the top level native OS window object
-//    native_window_t get_top_level_window() {
-//      if (!self->top_level_window) {
-//        throw gbw_error("Top level native window was not set");
-//      }
-//      return self->top_level_window;
-//    }
-//
-//    /// Get the browser native OS window object
-//    native_window_t get_browser_window() {
-//      if (!self->browser_window) {
-//        throw gbw_error("Browser native window was not set");
-//      }
-//      return self->browser_window;
-//    }
