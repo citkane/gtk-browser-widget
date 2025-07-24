@@ -31,47 +31,91 @@ using namespace gbw;
 Ms_Webview2::~Ms_Webview2() {}
 
 Ms_Webview2::Ms_Webview2(gbw_widget_t *widget, gbw_browser_t *engine)
-    : Lib_gbw(widget, engine), browser(this), mswebview_api_api(this),
-      mswebview_api_layout(this), mswebview_api_signals(this) {};
+    : Lib_gbw(widget, engine), browser(this), layout_api(this) {};
+
+Ms_Webview2::mswebview_api_layout_t::mswebview_api_layout_t(Ms_Webview2 *self)
+    : browser_api_layout_t(self) {};
 
 void Ms_Webview2::mswebview_api_layout_t::fit(layout_t &layout) {
   RECT const rect{0, 0, layout.width, layout.height};
   self->browser.api.controller()->put_Bounds(rect);
 };
 
-ready_signal_t &Ms_Webview2::mswebview_api_signals_t::core_ready() {
-  return self->get_core_ready_signal();
-};
-ready_signal_t &Ms_Webview2::mswebview_api_signals_t::env_ready() {
-  return self->get_environment_ready_signal();
-};
-ready_signal_t &Ms_Webview2::mswebview_api_signals_t::controller_ready() {
-  return self->get_controller_ready_signal();
-};
-
-smart_core_t &Ms_Webview2::mswebview_api_api_t::core() {
-  return self->get_api_core();
-};
-
-smart_control_t &Ms_Webview2::mswebview_api_api_t::controller() {
-  return self->get_api_controller();
-};
-
-smart_env_t &Ms_Webview2::mswebview_api_api_t::environment() {
-  return self->get_api_environment();
-};
+Ms_Webview2::mswebview_api_t::mswebview_api_t(Ms_Webview2 *self)
+    : browser_api_t(self) {};
 
 void Ms_Webview2::mswebview_api_t::init() {
-  std::cout << "initialising browser engine\n";
+  std::cout << "Initialising MsWebview2 engine\n";
   self->browser.signals.env_ready().connect(
       [this] { self->create_browser_controller_and_core(); });
 
   auto handler = new Environment::CompletedHandler(*self);
 
   if (create_webview2(nullptr, nullptr, nullptr, handler) != S_OK) {
-    throw GBW_error("Failed to create MsWebview2");
+    throw gbw_error("Failed to create MsWebview2");
   }
 };
+
+void Ms_Webview2::create_browser_controller_and_core() {
+  if (!gbw.windows_are_ready()) {
+    gbw.signals.windows_are_ready().connect(
+        [this] { create_browser_controller_and_core(); });
+    return;
+  }
+
+  auto handler = new Controller::CompletedHandler(*this);
+  auto res = browser.api.environment()->CreateCoreWebView2Controller(
+      os.window.browser(), handler);
+  if (res != S_OK) {
+    throw gbw_error("Failed to CreateCoreWebView2Controller");
+  }
+}
+
+// void Ms_Webview2::set_browser_env(browser_env_t &environment) {
+//   std::cout << "- Got MsWebview2 browser environment\n";
+//   set_api_environment(environment);
+//   browser.signals.env_ready().emit();
+// }
+//
+// void Ms_Webview2::set_browser_controller(browser_controller_t &controller) {
+//   std::cout << "- Got MsWebview2 browser controller\n";
+//   api_controller = smart_control_t(&controller);
+//   browser.signals.controller_ready().emit();
+//   /// fit_browser_to_window(0, 0, bounds->get_width(), bounds->get_height());
+// }
+//
+// void Ms_Webview2::set_browser_core(browser_core_t &core) {
+//   std::cout << "- Got MsWebview2 browser core\n";
+//   api_core = smart_core_t(&core);
+//   browser.signals.core_ready().emit();
+//   /// api_controller->put_IsVisible(TRUE);
+//
+//   // Glib::signal_idle().connect([this] { return layout_update_cb(); });
+//
+//   /// browser.core_ready_signal().emit();
+// }
+
+// ready_signal_t &Ms_Webview2::mswebview_api_signals_t::core_ready() {
+//   return self->get_core_ready_signal();
+// };
+// ready_signal_t &Ms_Webview2::mswebview_api_signals_t::env_ready() {
+//   return self->get_environment_ready_signal();
+// };
+// ready_signal_t &Ms_Webview2::mswebview_api_signals_t::controller_ready() {
+//   return self->get_controller_ready_signal();
+// };
+
+// smart_core_t &Ms_Webview2::mswebview_api_api_t::core() {
+//   return self->get_api_core();
+// };
+//
+// smart_control_t &Ms_Webview2::mswebview_api_api_t::controller() {
+//   return self->get_api_controller();
+// };
+//
+// smart_env_t &Ms_Webview2::mswebview_api_api_t::environment() {
+//   return self->get_api_environment();
+// };
 
 // smart_core_t &Ms_Webview2::browser_get_core_impl() { return browser_core; }
 //
@@ -93,43 +137,9 @@ void Ms_Webview2::mswebview_api_t::init() {
 //      [this] { create_browser_controller_and_core(); });
 //  auto handler = new Environment::CompletedHandler(*this);
 //  if (create_webview2(nullptr, nullptr, nullptr, handler) != S_OK) {
-//    throw GBW_error("Failed to create MsWebview2");
+//    throw gbw_error("Failed to create MsWebview2");
 //  }
 //}
-
-void Ms_Webview2::set_browser_env(browser_env_t &environment) {
-  std::cout << "- Got MsWebview2 browser environment\n";
-  set_api_environment(environment);
-  browser.signals.env_ready().emit();
-  // environment_ready_signal.emit();
-}
-
-void Ms_Webview2::create_browser_controller_and_core() {
-  auto handler = new Controller::CompletedHandler(*this);
-
-  if (get_api_environment()->CreateCoreWebView2Controller(
-          os.get_browser_window(), handler) != S_OK) {
-    throw GBW_error("Failed to CreateCoreWebView2Controller");
-  }
-}
-
-void Ms_Webview2::set_browser_controller(browser_controller_t &controller) {
-  std::cout << "- Got MsWebview2 browser controller\n";
-  set_api_controller(controller);
-  browser.signals.controller_ready().emit();
-  /// fit_browser_to_window(0, 0, bounds->get_width(), bounds->get_height());
-}
-
-void Ms_Webview2::set_browser_core(browser_core_t &core) {
-  std::cout << "- Got MsWebview2 browser core\n";
-  set_api_core(core);
-  browser.signals.core_ready().emit();
-  /// api_controller->put_IsVisible(TRUE);
-
-  // Glib::signal_idle().connect([this] { return layout_update_cb(); });
-
-  /// browser.core_ready_signal().emit();
-}
 
 // bool Ms_Webview2::layout_update_cb() {
 //   auto native_top_level_window = os.get_top_level_window();

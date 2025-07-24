@@ -42,17 +42,19 @@ Lib_gbw::gbw_api_layout_t::gbw_api_layout_t(Lib_gbw *self)
     : nested_api_t(self) {};
 
 layout_t Lib_gbw::gbw_api_layout_t::get_rel() {
-  auto bounds =
-      self->gbw.window.browser().compute_bounds(self->gbw.window.top_level());
+
+  auto bounds = self->widget->compute_bounds(*self->gbw.window.top_level());
+
   int x = bounds->get_x();
   int y = bounds->get_y();
   int width = bounds->get_width();
   int height = bounds->get_height();
+
   return {x, y, width, height};
 }
 
 layout_t Lib_gbw::gbw_api_layout_t::get_new() {
-  auto native_window = self->os.get_top_level_window();
+  auto native_window = self->os.window.top_level();
   auto rel_layout = self->gbw.layout.get_rel();
   auto abs_layout = self->os.layout.get(native_window);
   auto csd_offset = self->gbw.csd.get_offset(abs_layout);
@@ -72,14 +74,23 @@ layout_eq_t Lib_gbw::gbw_api_layout_t::has_changed(layout_t &new_layout,
 };
 
 void Lib_gbw::gbw_api_layout_t::size_browser(layout_t &layout) {
-  self->gbw.window.browser().set_default_size(layout.width, layout.height);
+  self->gbw.window.browser()->set_default_size(layout.width, layout.height);
 };
 
 /* #endregion */
 /* #region Lib_gbw::gbw */
 
 Lib_gbw::gbw_api_t::gbw_api_t(Lib_gbw *self)
-    : nested_api_t(self), window(self), csd(self), layout(self) {}
+    : nested_api_t(self), window(self), csd(self), layout(self), signals(self) {
+}
+
+bool Lib_gbw::gbw_api_t::windows_are_ready() {
+  return self->windows_are_ready;
+};
+
+void Lib_gbw::gbw_api_t::windows_are_ready(bool flag) {
+  self->windows_are_ready = flag;
+};
 
 /* #endregion */
 /* #region Lib_gbw::gbw::window */
@@ -87,31 +98,32 @@ Lib_gbw::gbw_api_t::gbw_api_t(Lib_gbw *self)
 Lib_gbw::gbw_api_window_t::gbw_api_window_t(Lib_gbw *self)
     : nested_api_t(self) {};
 
-gtk_window_t &Lib_gbw::gbw_api_window_t::top_level() {
+gtk_window_t *Lib_gbw::gbw_api_window_t::top_level() {
   if (!self->top_level_window) {
-    self->top_level_window =
-        dynamic_cast<gtk_window_t *>(self->widget->get_root());
+    auto root_ptr = self->widget->get_root();
+    auto window = dynamic_cast<gtk_window_t *>(root_ptr);
+    self->top_level_window = window;
   }
-  return *self->top_level_window;
+  return self->top_level_window;
 };
 
-gtk_window_t &Lib_gbw::gbw_api_window_t::browser() {
+gtk_window_t *Lib_gbw::gbw_api_window_t::browser() {
   if (!self->browser_window) {
-    self->browser_window = self->engine;
+    self->browser_window = static_cast<gtk_window_t *>(self->engine);
   }
-  return *self->browser_window;
+  return self->browser_window;
 };
 
 /* #endregion */
 /* #region Lib_gbw::gbw::csd */
 
 bool Lib_gbw::gbw_api_csd_t::is_active() {
-  auto &window = self->gbw.window.top_level();
-  auto is_application = !!window.get_application();
-  auto has_titlebar = !!window.get_titlebar();
+  auto window = self->gbw.window.top_level();
+  auto is_application = !!window->get_application();
+  auto has_titlebar = !!window->get_titlebar();
   auto csd_env = std::getenv("GTK_CSD");
   auto csd_env_disabled = !!csd_env && std::string(csd_env) == "0";
-  auto undecorated = !window.get_decorated();
+  auto undecorated = !window->get_decorated();
 
   // std::cout << "is_application: " << (is_application ? "true" : "false")
   //           << "\n";
@@ -131,13 +143,13 @@ Lib_gbw::gbw_api_csd_t::gbw_api_csd_t(Lib_gbw *self) : nested_api_t(self) {};
 position_t &Lib_gbw::gbw_api_csd_t::fudge() { return self->csd_fudge; }
 
 position_t Lib_gbw::gbw_api_csd_t::get_offset(layout_t native) {
-  auto &gtk = self->gbw.window.top_level();
-  if (gtk.is_maximized() || !gtk.is_active()) {
+  auto gtk = self->gbw.window.top_level();
+  if (gtk->is_maximized() || !gtk->is_active()) {
     return {0, 0};
   }
 
-  auto gtk_width = gtk.get_allocated_width();
-  auto gtk_height = gtk.get_allocated_height();
+  auto gtk_width = gtk->get_allocated_width();
+  auto gtk_height = gtk->get_allocated_height();
   // Half the total decoration size in each direction gives us a best estimate
   // xy origin adjustment. We may still need to apply an additional
   // user provided fudge depending on the asymmetry of any given theme.
@@ -147,6 +159,17 @@ position_t Lib_gbw::gbw_api_csd_t::get_offset(layout_t native) {
   return {x, y};
 }
 
+/* #endregion */
+/* #region Lib_gbw::gbw::signals */
+
+Lib_gbw::gbw_api_signals_t::gbw_api_signals_t(Lib_gbw *self)
+    : nested_api_t(self) {}
+
+ready_signal_t Lib_gbw::gbw_api_signals_t::windows_are_ready() {
+  return self->windows_are_ready_signal;
+}
+
+/* #endregion */
 void Lib_gbw::fudge(int x, int y) { Lib_gbw::csd_fudge = {x, y}; };
 
 // position_t Windows::win_api_window_t::csd_decorations_offset_imp(

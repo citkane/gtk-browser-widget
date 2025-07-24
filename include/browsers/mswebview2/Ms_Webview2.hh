@@ -45,51 +45,28 @@ namespace gbw::browsers::mswebview2 {
 class Ms_Webview2 : lib_mswebview2::Environment,
                     lib_mswebview2::Controller,
                     protected Lib_gbw {
+public:
+  virtual ~Ms_Webview2() = 0;
+  Ms_Webview2(gbw_widget_t *widget, gbw_browser_t *engine);
 
-  struct mswebview_api_layout_t : browser_api_layout_t {
-    mswebview_api_layout_t(Ms_Webview2 *self) : browser_api_layout_t(self) {};
-
-    void fit(layout_t &layout) override;
-  };
-
-  struct mswebview_api_signals_t : browser_api_signals_t {
-    mswebview_api_signals_t(Ms_Webview2 *self) : browser_api_signals_t(self) {}
-
-    ready_signal_t &core_ready() override;
-    ready_signal_t &env_ready() override;
-    ready_signal_t &controller_ready() override;
-  };
-
-  struct mswebview_api_api_t : browser_api_api_t {
-    mswebview_api_api_t(Ms_Webview2 *self) : browser_api_api_t(self) {};
-
-    smart_core_t &core() override;
-
-    smart_control_t &controller() override;
-
-    smart_env_t &environment() override;
-  };
-
+private:
   struct mswebview_api_t : browser_api_t {
-    mswebview_api_t(Ms_Webview2 *self)
-        : browser_api_t(self, &self->mswebview_api_api,
-                        &self->mswebview_api_layout,
-                        &self->mswebview_api_signals) {};
+    mswebview_api_t(Ms_Webview2 *self);
 
     void init() override;
   };
 
-public:
-  virtual ~Ms_Webview2() = 0;
-  Ms_Webview2(gbw_widget_t *widget, gbw_browser_t *engine);
+  struct mswebview_api_layout_t : browser_api_layout_t {
+    mswebview_api_layout_t(Ms_Webview2 *self);
+
+    void fit(layout_t &layout) override;
+  };
 
 protected:
   mswebview_api_t browser;
 
 private:
-  mswebview_api_api_t mswebview_api_api;
-  mswebview_api_layout_t mswebview_api_layout;
-  mswebview_api_signals_t mswebview_api_signals;
+  mswebview_api_layout_t layout_api;
 
   void set_browser_env(browser_env_t &environment);
   void set_browser_controller(browser_controller_t &controller);
@@ -111,9 +88,29 @@ private:
 
   friend class lib_mswebview2::Environment;
   friend class lib_mswebview2::Controller;
+  friend class Lib_browser;
 };
 
 } // namespace gbw::browsers::mswebview2
 
 #endif // _WIN32
 #endif // GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
+
+//  struct mswebview_api_signals_t : browser_api_signals_t {
+//    mswebview_api_signals_t(Ms_Webview2 *self) : browser_api_signals_t(self)
+//    {}
+//
+//    ready_signal_t &core_ready() override;
+//    ready_signal_t &env_ready() override;
+//    ready_signal_t &controller_ready() override;
+//  };
+
+// struct mswebview_api_api_t : browser_api_api_t {
+//   mswebview_api_api_t(Ms_Webview2 *self) : browser_api_api_t(self) {};
+//
+//  smart_core_t &core() override;
+//
+//  smart_control_t &controller() override;
+//
+//  smart_env_t &environment() override;
+//};

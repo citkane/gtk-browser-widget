@@ -35,36 +35,30 @@ class Lib_os : protected Lib_browser {
 
 public:
   virtual ~Lib_os() = 0;
-  Lib_os() {};
+  Lib_os() = default;
 
 protected:
-  struct os_api_window_size_t : nested_api_t<Os> {
-    os_api_window_size_t(Os *self) : nested_api_t(self) {};
-
-    /// Gets pixel size for the top level native window
-    virtual dimension_t top_level(float dpi_scale) = 0;
-    /// Gets pixel size for the browser native window
-    virtual dimension_t browser(float dpi_scale) = 0;
-    /// Gets pixel size for the given native window
-    virtual dimension_t get(native_window_t &native_window,
-                            float dpi_scale) = 0;
-  };
-
   struct os_api_layout_t : nested_api_t<Os> {
-    os_api_layout_t(Os *self) : nested_api_t(self) {};
+    os_api_layout_t(Os *self);
 
     /// Gets the pixel layout for the given native window relative to the screen
     virtual layout_t get(native_window_t &native_window) = 0;
 
-    /// Moves the native browser window to the new pixel origin relative to the
+    /// Gets the top left pixel position for the given native window
+    virtual position_t get_position(native_window_t &native_window,
+                                    float dpi_scale) = 0;
+
+    /// Gets pixel size for the given native window
+    virtual dimension_t get_size(native_window_t &native_window,
+                                 float dpi_scale) = 0;
+
+    /// Moves the given native window to the new pixel origin relative to the
     /// screen
-    virtual void move_browser(layout_t &new_layout) = 0;
+    virtual void move(native_window_t &native_window, layout_t &new_layout) = 0;
   };
 
   struct os_api_window_t : nested_api_t<Os> {
-    os_api_window_t(Os *self, os_api_window_size_t *size)
-        : nested_api_t(self), size(*size) {};
-
+    os_api_window_t(Os *self);
     /// Converts a `Gtk::Window` to an OS native window
     /// @throws exception if conversion fails.
     virtual native_window_t convert_gtk_to_native(gtk_window_t &window) = 0;
@@ -72,16 +66,22 @@ protected:
     /// Gets the dpi scale for the given native window
     virtual float get_dpi_scale(native_window_t &native_window) = 0;
 
-    /// Gets the top left pixel position for the given native window
-    virtual position_t get_position(native_window_t &native_window,
-                                    float dpi_scale) = 0;
+    /// Get the top level native OS window object
+    virtual native_window_t top_level() = 0;
 
-    os_api_window_size_t &size;
+    /// Get the browser native OS window object
+    virtual native_window_t browser() = 0;
   };
 
-  struct os_api_t : nested_api_t<Lib_os> {
-    os_api_t(Lib_os *self, os_api_window_t *window, os_api_layout_t *layout)
-        : nested_api_t(self), window(*window), layout(*layout) {};
+  struct os_api_signals_t : nested_api_t<Lib_os> {
+    os_api_signals_t(Lib_os *self);
+
+    /// The signal for the Os native windows ready event.
+    ready_signal_t &native_windows_ready();
+  };
+
+  struct os_api_t : nested_api_t<Os> {
+    os_api_t(Os *self);
 
     /// OS API for working with native windows
     os_api_window_t &window;
@@ -89,36 +89,39 @@ protected:
     /// OS API for working with native window layouts
     os_api_layout_t &layout;
 
-    /// Sets the native OS top level and browser windows for the corresponding
-    /// `Gtk::Window`s
-    void set_native_windows(gtk_window_t &top_level, gtk_window_t &browser) {
-      self->top_level_window = window.convert_gtk_to_native(top_level);
-      self->browser_window = window.convert_gtk_to_native(browser);
-    }
+    os_api_signals_t signals;
 
-    /// Get the top level native OS window object
-    native_window_t get_top_level_window() {
-      if (!self->top_level_window) {
-        throw GBW_error("Top level native window was not set");
-      }
-      return self->top_level_window;
-    }
-
-    /// Get the browser native OS window object
-    native_window_t get_browser_window() {
-      if (!self->browser_window) {
-        throw GBW_error("Browser native window was not set");
-      }
-      return self->browser_window;
-    }
+    virtual void set_native_windows(gtk_window_t &top_level,
+                                    gtk_window_t &browser) = 0;
   };
+
+  void set_native_windows(native_window_t &top_level, native_window_t &browser);
 
 private:
   native_window_t top_level_window;
   native_window_t browser_window;
+
+  ready_signal_t native_windows_ready_signal;
+
+  friend gbw::os::Os;
 };
 
-inline Lib_os::~Lib_os() {}
 } // namespace gbw::os
 
 #endif // GBW_OS_LIB_LIB_OS_HH
+
+//    /// Get the top level native OS window object
+//    native_window_t get_top_level_window() {
+//      if (!self->top_level_window) {
+//        throw gbw_error("Top level native window was not set");
+//      }
+//      return self->top_level_window;
+//    }
+//
+//    /// Get the browser native OS window object
+//    native_window_t get_browser_window() {
+//      if (!self->browser_window) {
+//        throw gbw_error("Browser native window was not set");
+//      }
+//      return self->browser_window;
+//    }

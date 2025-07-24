@@ -33,6 +33,14 @@ namespace core::lib {
 
 class Lib_gbw : protected Os {
 
+public:
+  virtual ~Lib_gbw() = 0;
+  Lib_gbw(gbw_widget_t *widget, gbw_browser_t *engine);
+  /// Set the fudge offset to compensate for pixel perfect alignment
+  /// @see gbw::options::gtk::csd::set_fudge
+  static void fudge(int x, int y);
+
+private:
   struct gbw_api_layout_t : nested_api_t<Lib_gbw> {
     gbw_api_layout_t(Lib_gbw *self);
 
@@ -58,10 +66,10 @@ class Lib_gbw : protected Os {
     gbw_api_window_t(Lib_gbw *self);
 
     /// Gets the top level Gtk::Window
-    gtk_window_t &top_level();
+    gtk_window_t *top_level();
 
     /// Gets the browser Gtk::Window
-    gtk_window_t &browser();
+    gtk_window_t *browser();
   };
 
   struct gbw_api_csd_t : nested_api_t<Lib_gbw> {
@@ -83,22 +91,26 @@ class Lib_gbw : protected Os {
     position_t get_offset(layout_t native);
   };
 
+  struct gbw_api_signals_t : nested_api_t<Lib_gbw> {
+    gbw_api_signals_t(Lib_gbw *self);
+
+    ready_signal_t windows_are_ready();
+  };
+
   struct gbw_api_t : private nested_api_t<Lib_gbw> {
     gbw_api_t(Lib_gbw *self);
     /// Gtk::Window related operations
     gbw_api_window_t window;
     /// Gtk CSD (Client Side Decoration) related operations
     gbw_api_csd_t csd;
-    /// Gtk window layout related operations
+    /// GBW window layout related operations
     gbw_api_layout_t layout;
-  };
+    /// GBW signal related operations
+    gbw_api_signals_t signals;
 
-public:
-  virtual ~Lib_gbw() = 0;
-  Lib_gbw(gbw_widget_t *widget, gbw_browser_t *engine);
-  /// Set the fudge offset to compensate for pixel perfect alignment
-  /// @see gbw::options::gtk::csd::set_fudge
-  static void fudge(int x, int y);
+    bool windows_are_ready();
+    void windows_are_ready(bool flag);
+  };
 
 protected:
   /// Gbw API root
@@ -109,8 +121,11 @@ private:
 
   gbw_widget_t *widget;
   gbw_browser_t *engine;
-  gtk_window_t *top_level_window;
-  gtk_window_t *browser_window;
+  gtk_window_t *top_level_window = nullptr;
+  gtk_window_t *browser_window = nullptr;
+
+  ready_signal_t windows_are_ready_signal;
+  bool windows_are_ready{};
 
   friend class gbw::Browser_widget;
   friend struct gbw_api_t;

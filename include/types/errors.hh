@@ -29,7 +29,7 @@
 #include <stdexcept>
 
 namespace gbw::types {
-using GBW_error = std::runtime_error;
+using gbw_error = std::runtime_error;
 }
 
 #endif // GBW_TYPES_ERRORS_HH

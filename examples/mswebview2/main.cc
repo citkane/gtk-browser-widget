@@ -16,6 +16,7 @@ public:
     browser.ready().connect([this] {
       auto bw = browser.api_core();
       bw->Navigate(L"https://www.gtk.org/");
+      // bw->OpenDevToolsWindow();
     });
 
     set_title("Example GBW application");

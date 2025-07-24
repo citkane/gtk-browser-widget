@@ -31,17 +31,38 @@ Windows::~Windows() {}
 
 /* #region os::layout */
 
+Windows::win_api_layout_t::win_api_layout_t(Windows *self)
+    : os_api_layout_t(self) {};
+
 layout_t Windows::win_api_layout_t::get(HWND &hWnd) {
   auto dpi_scale = self->os.window.get_dpi_scale(hWnd);
-  auto position = self->os.window.get_position(hWnd, dpi_scale);
-  auto size = self->os.window.size.get(hWnd, dpi_scale);
+  auto position = self->os.layout.get_position(hWnd, dpi_scale);
+  auto size = self->os.layout.get_size(hWnd, dpi_scale);
 
   return {position.x, position.y, size.width, size.height};
 }
 
-void Windows::win_api_layout_t::move_browser(layout_t &new_layout) {
-  MoveWindow(self->os.get_browser_window(), new_layout.x, new_layout.y,
-             new_layout.width, new_layout.width, FALSE);
+void Windows::win_api_layout_t::move(HWND &native_window, layout_t &layout) {
+  MoveWindow(native_window, layout.x, layout.y, layout.width, layout.width,
+             FALSE);
+}
+
+position_t Windows::win_api_layout_t::get_position(HWND &hWnd,
+                                                   float dpi_scale) {
+  POINT top_left = {0, 0};
+  ClientToScreen(hWnd, &top_left);
+  int y = round(top_left.y * dpi_scale);
+  int x = round(top_left.x * dpi_scale);
+  return {x, y};
+}
+
+dimension_t Windows::win_api_layout_t::get_size(HWND &hWnd, float dpi_scale) {
+  RECT rect;
+  GetWindowRect(hWnd, &rect);
+  int width = round((rect.right - rect.left) * dpi_scale);
+  int height = round((rect.bottom - rect.top) * dpi_scale);
+
+  return {width, height};
 }
 
 /* #endregion */
@@ -50,12 +71,12 @@ void Windows::win_api_layout_t::move_browser(layout_t &new_layout) {
 HWND Windows::win_api_window_t::convert_gtk_to_native(gtk_window_t &window) {
   auto surface = window.get_native()->get_surface();
   if (!surface->gobj()) {
-    throw GBW_error("Failed to get surface from Gtk:Window");
+    throw gbw_error("Failed to get surface from Gtk:Window");
   }
 
   auto *hWnd = GDK_SURFACE_HWND(GDK_SURFACE(surface->gobj()));
   if (!hWnd) {
-    throw GBW_error("Failed to get HWND from Gdk::Surface");
+    throw gbw_error("Failed to get HWND from Gdk::Surface");
   }
 
   return hWnd;
@@ -90,36 +111,37 @@ float Windows::win_api_window_t::get_dpi_scale(HWND &hWnd) {
   return dpi / 96.0f;
 }
 
-position_t Windows::win_api_window_t::get_position(HWND &hWnd,
-                                                   float dpi_scale) {
-  POINT top_left = {0, 0};
-  ClientToScreen(hWnd, &top_left);
-  int y = round(top_left.y * dpi_scale);
-  int x = round(top_left.x * dpi_scale);
-  return {x, y};
-}
+native_window_t Windows::win_api_window_t::top_level() {
+  if (!self->top_level_window) {
+    throw gbw_error("Top level native window was not set");
+  }
+  return self->top_level_window;
+};
+
+native_window_t Windows::win_api_window_t::browser() {
+  if (!self->browser_window) {
+    throw gbw_error("Browser native window was not set");
+  }
+  return self->browser_window;
+};
 
 /* #endregion */
-/* #region os::window::size */
 
-dimension_t Windows::win_api_window_size_t::get(HWND &hWnd, float dpi_scale) {
-  RECT rect;
-  GetWindowRect(hWnd, &rect);
-  auto scale = self->os.window.get_dpi_scale(hWnd);
-  int width = round((rect.right - rect.left) * scale);
-  int height = round((rect.bottom - rect.top) * scale);
+/* #region os::os */
+Windows::win_api_t::win_api_t(Windows *self) : os_api_t(self) {}
 
-  return {width, height};
-}
-
-dimension_t Windows::win_api_window_size_t::top_level(float dpi_scale) {
-  auto *hWnd = self->os.get_top_level_window();
-  return this->get(hWnd, dpi_scale);
-}
-
-dimension_t Windows::win_api_window_size_t::browser(float dpi_scale) {
-  auto *hWnd = self->os.get_browser_window();
-  return this->get(hWnd, dpi_scale);
+void Windows::win_api_t::set_native_windows(gtk_window_t &top_level,
+                                            gtk_window_t &browser) {
+  if (!top_level.gobj()) {
+    throw gbw_error("No top level window");
+  }
+  if (!browser.gobj()) {
+    throw gbw_error("No browser window");
+  }
+  auto top_level_window = window.convert_gtk_to_native(top_level);
+  auto browser_window = window.convert_gtk_to_native(browser);
+  self->set_native_windows(top_level_window, browser_window);
+  signals.native_windows_ready().emit();
 }
 
 /* #endregion */

@@ -40,67 +40,59 @@ namespace os::windows {
 /// - @ref gbw::os::windows::smart_ptr
 /// - @ref gbw::os::windows::Callback_handler
 /// @ref os/windows/types/types_winos.hh
-class Windows : protected Lib_os {
-
-  struct win_api_window_size_t : os_api_window_size_t {
-    win_api_window_size_t(Windows *self) : os_api_window_size_t(self) {};
-
-    dimension_t top_level(float dpi_scale) override;
-    dimension_t browser(float dpi_scale) override;
-    dimension_t get(native_window_t &native_window, float dpi_scale) override;
-  };
-
-  struct win_api_layout_t : os_api_layout_t {
-    win_api_layout_t(Windows *self) : os_api_layout_t(self) {};
-
-    /// @copydoc os_api_window_t::get_layout
-    layout_t get(native_window_t &native_window) override;
-
-    /// @copydoc os_api_window_t::set_layout
-    void move_browser(layout_t &new_layout) override;
-  };
-
-  struct win_api_window_t : os_api_window_t {
-    win_api_window_t(Windows *self)
-        : os_api_window_t(self, &self->win_api_window_size) {};
-
-    /// @copydoc os_api_window_t::convert_gtk_to_native
-    native_window_t convert_gtk_to_native(gtk_window_t &window) override;
-    /// @copydoc os_api_window_t::get_dpi_scale
-    float get_dpi_scale(native_window_t &native_window) override;
-    /// @copydoc os_api_window_t::get_position
-    position_t get_position(native_window_t &native_window,
-                            float dpi_scale) override;
-  };
-
+class Windows : public Lib_os {
 public:
   virtual ~Windows() = 0;
-  Windows()
-      : win_api_window(this), win_api_layout(this), win_api_window_size(this),
-        os(this, &win_api_window, &win_api_layout) {};
+  Windows() : os(this), api_window(this), api_layout(this) {};
 
-  /// @copydoc gbw::attach_win32_console
   static void attach_win32_console();
+
+private:
+  struct win_api_layout_t : public os_api_layout_t {
+    win_api_layout_t(Windows *self);
+
+    layout_t get(native_window_t &native_window) override;
+
+    position_t get_position(native_window_t &native_window,
+                            float dpi_scale) override;
+
+    dimension_t get_size(native_window_t &native_window,
+                         float dpi_scale) override;
+
+    void move(native_window_t &native_window, layout_t &new_layout) override;
+  };
+
+  struct win_api_window_t : public os_api_window_t {
+    win_api_window_t(Windows *self) : os_api_window_t(self) {};
+
+    native_window_t convert_gtk_to_native(gtk_window_t &window) override;
+
+    float get_dpi_scale(native_window_t &native_window) override;
+
+    native_window_t top_level() override;
+
+    native_window_t browser() override;
+  };
+
+  struct win_api_t : public os_api_t {
+    win_api_t(Windows *self);
+
+    void set_native_windows(gtk_window_t &top_level,
+                            gtk_window_t &browser) override;
+  };
 
 protected:
   /// The gwb::os API root
-  os_api_t os;
-
-  /// @copydoc gbw::gtk::Lib_gtk:native_window_from_gtk_imp
-  // HWND native_window_from_gtk_imp(gtk_window_t &window) override;
-
-  /// @copydoc gbw::gtk::Lib_gtk::native_window_dpi_scale_imp
-  // float native_window_dpi_scale_imp(HWND &hWnd) override;
-
-  ///// @copydoc gbw::gtk::Lib_gtk::csd_decorations_offset_imp
-  // position_t csd_decorations_offset_imp(HWND &hWnd, gtk_window_t &window,
-  //                                       position_t &fudge) override;
+  win_api_t os;
 
 private:
   static bool is_console_attached;
-  win_api_window_t win_api_window;
-  win_api_window_size_t win_api_window_size;
-  win_api_layout_t win_api_layout;
+
+  win_api_window_t api_window;
+  win_api_layout_t api_layout;
+  // win_api_signals_t win_api_signals;
+
+  friend struct Lib_os::os_api_t::os_api_t;
 
 }; // namespace gbw
 

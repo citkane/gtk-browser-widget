@@ -41,6 +41,7 @@ Browser_window::Browser_window(gbw_widget_t *widget)
     : Browser_engine(widget, this) {
   Gtk::manage(this);
 
+  browser.init();
   browser_window_init_config();
 };
 
@@ -61,28 +62,32 @@ void Browser_window::browser_window_init_config() {
 }
 
 void Browser_window::window_realised_cb() {
-  std::cout << "Browser window is realised\n";
+  std::cout << "- Browser window is realised\n";
   Glib::signal_idle().connect_once([this] { window_ready_cb(); });
 }
 
 void Browser_window::window_ready_cb() {
-  std::cout << "Browser window is ready\n";
-  auto &top_level_window = gbw.window.top_level();
-  os.set_native_windows(top_level_window, *this);
-
-  Glib::signal_idle().connect([this] {
-    auto layout = gbw.layout.get_new();
-    layout_update(layout);
-    return true;
-  });
-
+  std::cout << "- Browser window is ready\n";
+  os.set_native_windows(*gbw.window.top_level(), *gbw.window.browser());
   set_focus_controller();
-  set_transient_for(top_level_window);
+  set_transient_for(*gbw.window.top_level());
 
   browser.signals.core_ready().connect([this] {
     set_visible(true);
     present();
+    auto layout = gbw.layout.get_new();
+    layout_update(layout);
+    browser.api.controller()->put_IsVisible(TRUE);
+
+    Glib::signal_idle().connect([this] {
+      auto layout = gbw.layout.get_new();
+      layout_update(layout);
+      return true;
+    });
   });
+
+  gbw.windows_are_ready(true);
+  gbw.signals.windows_are_ready().emit();
 }
 
 void Browser_window::set_focus_controller() {
@@ -95,7 +100,7 @@ void Browser_window::set_focus_controller() {
         if (!focus_changed) {
           return true;
         }
-        gbw.window.top_level().present();
+        gbw.window.top_level()->present();
         return false;
       },
       true);
@@ -106,13 +111,17 @@ void Browser_window::layout_update(layout_t &new_layout) {
   if (!change.origin && !change.size) {
     return;
   }
+  auto native_window = os.window.browser();
   if (change.origin) {
-    os.layout.move_browser(new_layout);
+    os.layout.move(native_window, new_layout);
   }
   if (change.size) {
     gbw.layout.size_browser(new_layout);
+    if (!browser.api.ready()) {
+      return;
+    }
     browser.layout.fit(new_layout);
   }
 
-  current_layout = std::move(new_layout);
+  current_layout = new_layout;
 };
