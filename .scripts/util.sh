@@ -2,6 +2,10 @@
 # shellcheck disable=SC2153
 # shellcheck disable=SC2034
 
+BROWSER=""
+BROWSER_INCLUDE_DIR=""
+BROWSER_LIB_DIR=""
+NUGET=$PACKAGE_DIR/bin/nuget.exe
 set_build_type() {
     for arg in "$@"; do
         if [[ "$arg" == "Debug" || "$arg" == "Release" || "$arg" == "RelWithDebInfo" ]]; then
@@ -59,24 +63,71 @@ is_generated() {
     fi
 }
 
+select_browser_caller() {
+
+    if [ -z $1 ]; then 
+        BROWSER="chromium"
+        echo "Using the default browser 'chromium'"
+    else
+        BROWSER="$1"
+    fi
+
+    if [[ "$BROWSER" = "chromium" ]]; then
+        BROWSER="chromium"
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include\
+        -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64\
+        -DBROWSER=$BROWSER"
+    elif [[ "$BROWSER" = "mswebview2" ]]; then
+        BROWSER="mswebview2"
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/include\
+        -DBROWSER_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/x64\
+        -DBROWSER=$BROWSER"
+    else
+        echo "'$1' was not a valid browser option: $BROWSER_OPTIONS"
+        select_browser_caller
+    fi
+}
+
+
+
+verify_nuget() {
+    
+    mkdir -p "$PACKAGE_DIR/bin"
+
+    if [ ! -f "$NUGET" ]; then
+        curl -o "$NUGET" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+    fi
+    
+
+}
+install_cef() {
+    $NUGET install chromiumembeddedframework.runtime -Version $CHROMIUM_NUGET_V -OutputDirectory "$PACKAGE_DIR"
+    echo "CEF installed successfully"
+}
+
+install_mswebview2() {    
+    $NUGET install Microsoft.Web.WebView2 -Version $MSWEBVIEW_NUGET_V -OutputDirectory "$PACKAGE_DIR"
+    echo "MS WebView2 installed successfully"
+}
+
 check_env() {
     case "$(uname | tr '[:upper:]' '[:lower:]')" in
     msys* | cygwin* | mingw*)
         # Now check if the environment is MSYS2 UCRT
         if [ "$MSYSTEM" != "UCRT64" ]; then
-throw_error "\
+            throw_error "\
 On Windows, you must use the MSYS2 UCRT64 terminal environment for this script.\n\
-For download and installation, see: https://www.msys2.org" && return 1
+For download and installation, see: https://www.msys2.org"
+            return 1
         fi
-        SYS_OPTS="\
--DMSWEBVIEW_INCLUDE_DIR=$MSWEBVIEW_INCLUDE_DIR \
--DMSWEBVIEW_LIB_DIR=$MSWEBVIEW_LIB_DIR \
--DMSWEBVIEW2=ON \
-        "
+        ;;
     esac
 
     return 0;
 }
+
 
 resolve_path() {
   echo "$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")"

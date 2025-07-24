@@ -21,7 +21,7 @@ function (set_browser_definition)
     endif()
     # Proceed if only one embedded browser has been defined
     if("${count}" GREATER 0)
-        # Throw fatal error if MSWEBVIEW2 is defined for a non Winidows OS
+        # Throw fatal error if MSWEBVIEW2 is defined for a non Windows OS
         if(MSWEBVIEW2 AND NOT WIN32)
             message(FATAL_ERROR "MSWEBVIEW2 is only available on the Windows operating system")
         endif()
@@ -40,5 +40,19 @@ function (set_browser_definition)
         target_compile_definitions(${PROJECT_NAME} PRIVATE EBW_MSWEBVIEW2=ON)
     else()
         target_compile_definitions(${PROJECT_NAME} PRIVATE EBW_WEBKIT=ON)
+    endif()
+endfunction()
+
+function (set_browser_linked_lib)
+    if(WIN32)
+        if("${BROWSER}" STREQUAL "mswebview2")
+            set(BROWSER_LINKED_LIB "WebView2Loader.dll" PARENT_SCOPE)
+        elseif("${BROWSER}" STREQUAL "chromium")
+            set(BROWSER_LINKED_LIB "chromium.dll" PARENT_SCOPE)
+        endif()
+    elseif(APPLE)
+        # Placeholder for Mac logic
+    else() # Linux
+        # Placeholder for Linux logic
     endif()
 endfunction()

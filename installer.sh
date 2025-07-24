@@ -11,40 +11,64 @@ BUILD_TARGET=""
 INSTALL_DIR=$(pwd)/.dist
 PACKAGE_DIR=$(pwd)/.packages
 
-MSWEBVIEW_VERSION=1.0.3351.48
-MSWEBVIEW_INCLUDE_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/include
-MSWEBVIEW_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_VERSION/build/native/x64
-
+MSWEBVIEW_NUGET_V=1.0.3351.48
+CHROMIUM_NUGET_V=138.0.17
+BROWSER_OPTIONS="<chromium|mswebview2>"
 SYS_OPTS=""
 
 PATH=$(cygpath -w /ucrt64/bin):$PATH
 export PATH
-
 source ./.scripts/util.sh
 # For Windows, check that we are running in a MSYS2 UCRT environment
 check_env
 
+
+SELECT_BROWSER_HELP="\
+#  Selects the browser engine to use
+## Options:
+#      chromium                                                 Use Chromium Embedded Framework (CEF)
+#      mswebview2                                               Use Microsoft WebView2 (Windows only)
+## Default:
+#      chromium
+## Usage:
+#      select_browser $BROWSER_OPTIONS                          
+"
+select_browser() {
+    if [ "$(is_help "$@")" = true ]; then
+        print_help "$SELECT_BROWSER_HELP"
+        [ $PS1 ] && return 0 || exit 0
+    fi
+
+    select_browser_caller "$1"
+
+}
+
 PACKAGE_INSTALL_HELP="\
 #  Installs required library packages.
-#  ATM only MSWEBVIEW2 on Windows is supported, so we leave this as basic logic.
-#  @todo Expand the logic for mutiple OS and embedded browser packages.
+#  ALPHA stage: Supports MsWebview2 and Chromium on Windows OS.
+
 ## Usage:
-#   packages_install\
+#   packages_install
 "
+
 packages_install() {
     if [ "$(is_help "$@")" = true ]; then
         print_help "$PACKAGE_INSTALL_HELP"
         [[ $PS1 ]] && return 0 || exit 0
     fi
 
-    local nuget=$PACKAGE_DIR/bin/nuget.exe
-    mkdir -p "$PACKAGE_DIR/bin"
-
-    if [ ! -f "$nuget" ]; then
-        curl -o "$nuget" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+    if [ -z $BROWSER ]; then 
+        select_browser
     fi
-    $nuget install Microsoft.Web.WebView2 -Version $MSWEBVIEW_VERSION -OutputDirectory "$PACKAGE_DIR"
+    
+    verify_nuget
+    if [ "$BROWSER" = "chromium" ]; then
+        install_cef
+    elif [ "$BROWSER" = "mswebview2" ]; then
+        install_mswebview2
+    fi
 }
+
 
 SET_TARGET_HELP="\
 #  Sets the path to the compilation target
@@ -68,6 +92,10 @@ generate() {
     if ! is_target_file_set; then 
         return 1 
     fi
+    if [ -z $BROWSER ]; then 
+        select_browser
+    fi
+
 
     rm -rf "$BUILD_DIR"
     # shellcheck disable=SC2086
@@ -146,7 +174,6 @@ run() {
     if [ ! -f "$executable" ]; then
         install "$@"
     fi
-
     $executable
 }
 
@@ -161,7 +188,9 @@ Basic usage:
 $ source installer.sh   # Creates the installer session environment       (required)
 
 $ --help                # Prints help (this)
+$ select_browser        # Select browser engine
 $ packages_install      # Installs required packages
+$ set_target            # Set compilation target file
 $ generate              # Generate a clean build definition
 $ build                 # Builds the binary
 $ install               # Installs the built binary
@@ -171,6 +200,14 @@ $ <command> <-h --help> # Prints help for the command
 
 Advanced usage:
 ------------------------------------------------------------------------------------
+## select_browser: ################################################################
+$SELECT_BROWSER_HELP
+####################################################################################
+
+## set_target: ####################################################################
+$SET_TARGET_HELP
+####################################################################################
+
 ## packages_install: ###############################################################
 $PACKAGE_INSTALL_HELP
 ####################################################################################
