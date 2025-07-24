@@ -73,19 +73,6 @@ private:
   void set_browser_core(browser_core_t &core);
   void create_browser_controller_and_core();
 
-  /// Determines UI position and size changes on the @ref gbw::Browser_widget
-  /// instance and applies them to the @ref gbw::gtk::Browser_window instance
-  /// and it's contained browser display.
-  ///
-  /// @note Since GTK 4 we can no longer embed a `Gtk::Window` as a child of
-  /// another `Gtk::Window`, so we need to implement a pseudo-embed by tracking
-  /// UI changes and then natively pass them to pseudo-children.
-  ///
-  /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
-  // bool layout_update_cb();
-
-  // void fit_browser_to_window(LONG x, LONG y, LONG width, LONG height);
-
   friend class lib_mswebview2::Environment;
   friend class lib_mswebview2::Controller;
   friend class Lib_browser;
@@ -95,22 +82,3 @@ private:
 
 #endif // _WIN32
 #endif // GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
-
-//  struct mswebview_api_signals_t : browser_api_signals_t {
-//    mswebview_api_signals_t(Ms_Webview2 *self) : browser_api_signals_t(self)
-//    {}
-//
-//    ready_signal_t &core_ready() override;
-//    ready_signal_t &env_ready() override;
-//    ready_signal_t &controller_ready() override;
-//  };
-
-// struct mswebview_api_api_t : browser_api_api_t {
-//   mswebview_api_api_t(Ms_Webview2 *self) : browser_api_api_t(self) {};
-//
-//  smart_core_t &core() override;
-//
-//  smart_control_t &controller() override;
-//
-//  smart_env_t &environment() override;
-//};

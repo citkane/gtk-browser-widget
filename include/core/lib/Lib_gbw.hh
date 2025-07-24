@@ -36,6 +36,7 @@ class Lib_gbw : protected Os {
 public:
   virtual ~Lib_gbw() = 0;
   Lib_gbw(gbw_widget_t *widget, gbw_browser_t *engine);
+
   /// Set the fudge offset to compensate for pixel perfect alignment
   /// @see gbw::options::gtk::csd::set_fudge
   static void fudge(int x, int y);
