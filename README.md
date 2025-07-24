@@ -63,8 +63,9 @@ pacman -S mingw-w64-ucrt-x86_64-gtkmm-4.0
 git clone https://github.com/citkane/gtk-browser-widget.git
 cd gtk-browser-widget
 
-# Use the installer script
+# Use the installer script 
 source installer.sh
+set_browser mswebview2 # default is Chromium
 packages_install
 set_target examples/mswebview2/main.cc
 generate
@@ -104,7 +105,8 @@ Provides an easy to consume interface that binds native callback functions to br
 ## Language Bindings (todo)
 GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
 
-We plan to support the following languages:
+Support for the following languages is planned:
+
 
 - C
 - JavaScript

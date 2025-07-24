@@ -42,3 +42,17 @@ function (set_browser_definition)
         target_compile_definitions(${PROJECT_NAME} PRIVATE GBW_WEBKIT=ON)
     endif()
 endfunction()
+
+function (set_browser_linked_lib)
+    if(WIN32)
+        if("${BROWSER}" STREQUAL "mswebview2")
+            set(BROWSER_LINKED_LIB "WebView2Loader.dll" PARENT_SCOPE)
+        elseif("${BROWSER}" STREQUAL "chromium")
+            set(BROWSER_LINKED_LIB "chromium.dll" PARENT_SCOPE)
+        endif()
+    elseif(APPLE)
+        # Placeholder for Mac logic
+    else() # Linux
+        # Placeholder for Linux logic
+    endif()
+endfunction()
