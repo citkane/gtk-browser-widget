@@ -85,7 +85,6 @@ select_browser_caller() {
         -DBROWSER_LIB_DIR=$PACKAGE_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/x64\
         -DBROWSER=$BROWSER"
     else
-        # Handle both empty and invalid input in one condition
         echo "'$1' was not a valid browser option: $BROWSER_OPTIONS"
         select_browser_caller
     fi
