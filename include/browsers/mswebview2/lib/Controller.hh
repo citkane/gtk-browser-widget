@@ -22,15 +22,19 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
-#define EBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
+#ifndef GBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
+#define GBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
 
-#include "types/types.hh" // IWYU pragma: keep
+#include "browsers/mswebview2/types.hh"
+#include "os/windows/lib/smart_templates.hh" // IWYU pragma: keep
 
-namespace gbw::browsers::mswebview2 {
-class Ms_Webview2;
+using namespace gbw::os::windows::lib;
+using namespace gbw::browsers::types;
 
-namespace lib_mswebview2 {
+namespace gbw::browsers {
+class Mswebview2;
+
+namespace mswebview2 {
 
 /// MsWebview controls creation and access
 class Controller {
@@ -49,16 +53,16 @@ private:
 
 class Controller::CompletedHandler : public Cb_handler {
 public:
-  CompletedHandler(Ms_Webview2 &webview) : webview(&webview) {};
+  CompletedHandler(Mswebview2 &webview) : webview(&webview) {};
 
   HRESULT STDMETHODCALLTYPE Invoke(HRESULT result,
                                    browser_controller_t *controller_) override;
   MSG msg;
 
 private:
-  Ms_Webview2 *webview;
+  Mswebview2 *webview;
 };
 
-} // namespace lib_mswebview2
-} // namespace gbw::browsers::mswebview2
-#endif // EBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
+} // namespace mswebview2
+} // namespace gbw::browsers
+#endif // GBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH

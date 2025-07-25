@@ -6,16 +6,16 @@
 #include <gtkmm/paned.h>
 #include <gtkmm/popovermenubar.h>
 
-#include "Browser_widget.hh"
-#include "gtk/lib/Lib_gtk.hh"
+#include "Gbw_widget.hh"
 
 class Application : public Gtk::ApplicationWindow {
 public:
   Application() : browser() {
 
     browser.ready().connect([this] {
-      auto bw = browser.api().core;
+      auto bw = browser.api_core();
       bw->Navigate(L"https://www.gtk.org/");
+      // bw->OpenDevToolsWindow();
     });
 
     set_title("Example GBW application");
@@ -32,7 +32,7 @@ public:
   };
 
 private:
-  gbw::Browser_widget browser;
+  gbw::Gbw_widget browser;
   Gtk::PopoverMenuBar m_menubar;
   Gtk::Box m_vbox{Gtk::Orientation::VERTICAL};
   Gtk::Paned m_paned{Gtk::Orientation::HORIZONTAL};
@@ -56,14 +56,14 @@ private:
   }
 };
 
-#ifdef __WIN32__
+#ifdef _WIN32
 int CALLBACK WinMain(_In_ HINSTANCE /*hInstance*/,
                      _In_ HINSTANCE /*hPrevInstance*/, _In_ LPSTR /*lpCmdLine*/,
                      _In_ int /*nCmdShow*/) {
 
-  gbw::options::attach_win32_console();
-  gbw::options::set_gtk_csd_fudge(0, -2);
-  // gbw::options::try_bypass_gtk_csd();
+  gbw::options::win::attach_win32_console();
+  gbw::options::gtk::csd::set_fudge(0, -2);
+  // gbw::options::gtk::csd::try_bypass();
 
 #else
 int main() {
