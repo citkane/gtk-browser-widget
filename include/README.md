@@ -1,17 +1,17 @@
 [Home](../#development)
 # Development Notes
-GBW is developed for GTK 4 using it's official C++ interface, [gtkmm 4](https://gtkmm.gnome.org/en/).
+GBW is developed for GTK 4 using the official C++ interface, [gtkmm 4](https://gtkmm.gnome.org/en/).
 - [Getting Started with gtkmm](https://gnome.pages.gitlab.gnome.org/gtkmm-documentation/index.html)
 - [API reference](https://gnome.pages.gitlab.gnome.org/gtkmm/index.html)
 
-## Browser_widget.hh
+## Gbw_widget.hh
 This is the consumer-facing entry class that provides GBW. It is a [custom `Gtk::Widget`](https://gnome.pages.gitlab.gnome.org/gtkmm-documentation/chapter-customwidgets.html)
 
-## [Gtk 4](gtk)
+## [Gtk 4](core)
 Development should aim to offload operations to the gtkmm API. Guiding principles:
 - Do not get caught up in low level system complexities. Chances are that the GTK developers have already resolved it somewhere in the API.
-- Keep GTK related logic in the gtk folder/domain. When logic becomes OS/browser specific, use pure virtual methods with a naming logic that will suit all contexts.
-- GTK 4 has some limitions when compared to earlier releases. Most significantly for the GBW context is that windows can no longer be embedded into another window. This is expanded on further in the GTK readme linked above.
+- Keep GBW/GTK related logic in the `core` folder/domain. When logic becomes os/browser specific, use pure virtual methods in the `Lib_<os|browser>.hh` headers with a naming logic that will suit all contexts.
+- GTK 4 has some limitations when compared to earlier releases. Most significantly for the GBW context is that windows can no longer be embedded into another window. This is expanded on further in the chapter header link.
 
 ## [Operating Systems](os)
 GBW will support:

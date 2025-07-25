@@ -22,15 +22,19 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
-#define EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+#ifndef GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+#define GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
 
-#include "types/types.hh" // IWYU pragma: keep
+#include "browsers/mswebview2/types.hh"
+#include "os/windows/lib/smart_templates.hh" // IWYU pragma: keep
 
-namespace gbw::browsers::mswebview2 {
-class Ms_Webview2;
+using namespace gbw::os::windows::lib;
+using namespace gbw::browsers::types;
 
-namespace lib_mswebview2 {
+namespace gbw::browsers {
+class Mswebview2;
+
+namespace mswebview2 {
 
 /// MsWebview HWND evironment creation and access
 class Environment {
@@ -49,14 +53,14 @@ private:
 
 class Environment::CompletedHandler : public Cb_handler {
 public:
-  CompletedHandler(Ms_Webview2 &webview) : webview(&webview) {};
+  CompletedHandler(Mswebview2 &webview) : webview(&webview) {};
 
   HRESULT STDMETHODCALLTYPE Invoke(HRESULT result, browser_env_t *env) override;
 
 private:
-  Ms_Webview2 *webview;
+  Mswebview2 *webview;
 };
 
-} // namespace lib_mswebview2
-} // namespace gbw::browsers::mswebview2
-#endif // EBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH
+} // namespace mswebview2
+} // namespace gbw::browsers
+#endif // GBW_BROWSERS_MSWEBVIEW2_LIB_ENVIRONMENT_HH

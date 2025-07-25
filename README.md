@@ -17,7 +17,7 @@ GBW is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library. M
 // gtkmm headers MUST be included first
 #include <gtkmm/applicationwindow.h>
 
-#include "Browser_widget.hh"
+#include "Gbw_widget.hh"
 
 class Application : public Gtk::ApplicationWindow {
 public:
@@ -33,11 +33,11 @@ public:
     set_child(browser);
   };
 private:
-  gbw::Browser_widget browser;
+  gbw::Gbw_widget browser;
 };
 
 
-#ifdef __WIN32__
+#ifdef _WIN32
 int CALLBACK WinMain(_In_ HINSTANCE /*hInstance*/,
                      _In_ HINSTANCE /*hPrevInstance*/, _In_ LPSTR /*lpCmdLine*/,
                      _In_ int /*nCmdShow*/) {
@@ -63,8 +63,9 @@ pacman -S mingw-w64-ucrt-x86_64-gtkmm-4.0
 git clone https://github.com/citkane/gtk-browser-widget.git
 cd gtk-browser-widget
 
-# Use the installer script
+# Use the installer script 
 source installer.sh
+set_browser mswebview2 # default is Chromium
 packages_install
 set_target examples/mswebview2/main.cc
 generate
@@ -90,7 +91,7 @@ Development notes:
 GBW wants to uncomplicate and unboilerplate the embedded browser app development experience. What it does:
 - Starts a browser engine instance,
 - presents a browser window in a new top level `Gtk:Window`
-- [pseudo-embeds](include/gtk/#gtkwindow-gtkwidget-and-embedding) the window into the `gbw::Browser_widget` instance,
+- [pseudo-embeds](include/core/#gtkwindow-gtkwidget-and-embedding) the window into the `gbw::Gbw_widget` instance,
 - provides to the developer a full API of their chosen web engine
 
 From there, it is the developer's prerogative to plumb up their GTK application to the browser API in a way that suits their logic. GBW is not a framework, but rather a simple tool.
@@ -104,7 +105,8 @@ Provides an easy to consume interface that binds native callback functions to br
 ## Language Bindings (todo)
 GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
 
-We plan to support the following languages:
+Support for the following languages is planned:
+
 
 - C
 - JavaScript

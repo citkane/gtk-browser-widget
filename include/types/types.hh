@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_TYPES_TYPES_HH
-#define EBW_TYPES_TYPES_HH
+#ifndef GBW_TYPES_TYPES_HH
+#define GBW_TYPES_TYPES_HH
 
 #include <gdkmm/event.h>
 #include <gdkmm/graphene_point.h>
@@ -32,22 +32,24 @@
 #include <gtkmm/window.h>
 #include <optional>
 
+#include "browsers/types.hh" // IWYU pragma: keep
+#include "os/types.hh"       // IWYU pragma: keep
 #include "types/errors.hh"   // IWYU pragma: keep
-#include "types/includes.hh" // IWYU pragma: keep
+
+using namespace gbw::types;
+using namespace gbw::browsers::types;
+using namespace gbw::os::types;
 
 namespace gbw {
-class Browser_widget;
 
-namespace gtk {
-class Browser_window;
-}
+class Gbw_widget;
+
+namespace core {
+class Gbw_window;
+
+} // namespace core
 
 namespace types {
-
-struct offset_t {
-  int x;
-  int y;
-};
 
 constexpr Gdk::Event::Type FOCUS_CHANGE = Gdk::Event::Type::FOCUS_CHANGE;
 
@@ -57,17 +59,41 @@ using gdk_position_t = std::optional<Gdk::Graphene::Point>;
 
 using gtk_window_t = Gtk::Window;
 using gtk_widget_t = Gtk::Widget;
-using ebw_window_t = gbw::gtk::Browser_window;
-using ebw_widget_t = gbw::Browser_widget;
+
+using gbw_browser_t = gbw::core::Gbw_window;
+using gbw_widget_t = gbw::Gbw_widget;
+
+using ready_signal_t = sigc::signal<void()>;
 
 using smart_env_t = smart_ptr<browser_env_t>;
 using smart_control_t = smart_ptr<browser_controller_t>;
 using smart_core_t = smart_ptr<browser_core_t>;
 
-using ready_signal_t = sigc::signal<void()>;
+template <typename T> struct nested_api_t {
+  nested_api_t(T *self) : self(self) {}
+  T *self;
+};
+
+struct position_t {
+  int x;
+  int y;
+};
+struct dimension_t {
+  int width;
+  int height;
+};
+struct layout_t {
+  int x;
+  int y;
+  int width;
+  int height;
+};
+struct layout_eq_t {
+  bool origin;
+  bool size;
+};
 
 } // namespace types
-using namespace types;
 } // namespace gbw
 
-#endif // EBW_TYPES_TYPES_HH
+#endif // GBW_TYPES_TYPES_HH
