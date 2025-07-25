@@ -94,7 +94,6 @@ using smart_control_t = smart_ptr<browser_controller_t>;
 using smart_core_t = smart_ptr<browser_core_t>;
 
 } // namespace types
-
 } // namespace gbw
 
 #endif // GBW_TYPES_TYPES_HH

@@ -34,10 +34,10 @@
 #define GBW_BROWSERS_MSWEBVIEW2_MS_WEBVIEW2_HH
 #if defined(_WIN32) && defined(GBW_MSWEBVIEW2)
 
+#include "core/Gbw_base.hh"
+
 #include "browsers/mswebview2/lib/Controller.hh"
 #include "browsers/mswebview2/lib/Environment.hh"
-#include "core/Gbw_base.hh"
-#include "types/types.hh"
 
 using namespace gbw::core::lib;
 namespace gbw::browsers {

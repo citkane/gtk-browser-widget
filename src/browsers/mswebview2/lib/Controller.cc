@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
+#include "browsers/mswebview2/Mswebview2.hh" // include first
+
 #include "browsers/mswebview2/lib/Controller.hh"
-#include "browsers/mswebview2/Mswebview2.hh"
 
 using namespace gbw::browsers::mswebview2;
 

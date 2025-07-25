@@ -1,6 +1,5 @@
-#include "browsers/Browser.hh"
 #include "browsers/Browser_base.hh"
-
+#include "browsers/Browser.hh"
 
 using namespace gbw;
 using namespace gbw::browsers;
@@ -31,7 +30,7 @@ Browser_base::browser_api_api_t::browser_api_api_t(Browser_base *self)
 
 /// Gets the browser core API (ie. the window instance DOM/JS API)
 smart_core_t &Browser_base::browser_api_api_t::core() {
-  if (!self->api_core.Get()) {
+  if (!self->api_core.get()) {
     throw gbw_error("Browser core API was not set");
   }
   return self->api_core;
@@ -39,7 +38,7 @@ smart_core_t &Browser_base::browser_api_api_t::core() {
 
 /// Gets the browser controller API (ie. the browser engine settings)
 smart_control_t &Browser_base::browser_api_api_t::controller() {
-  if (!self->api_controller.Get()) {
+  if (!self->api_controller.get()) {
     throw gbw_error("Browser controller API was not set");
   }
   return self->api_controller;
@@ -47,7 +46,7 @@ smart_control_t &Browser_base::browser_api_api_t::controller() {
 
 /// Gets the browser environment API (ie. the browser engine environment)
 smart_env_t &Browser_base::browser_api_api_t::environment() {
-  if (!self->api_environment.Get()) {
+  if (!self->api_environment.get()) {
     throw gbw_error("Browser environment API was not set");
   }
   return self->api_environment;

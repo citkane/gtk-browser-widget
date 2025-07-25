@@ -25,7 +25,11 @@
 #ifndef GBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
 #define GBW_BROWSERS_MSWEBVIEW2_LIB_CONTROLLER_HH
 
-#include "types/types.hh" // IWYU pragma: keep
+#include "browsers/mswebview2/types.hh"
+#include "os/windows/lib/smart_templates.hh" // IWYU pragma: keep
+
+using namespace gbw::os::windows::lib;
+using namespace gbw::browsers::types;
 
 namespace gbw::browsers {
 class Mswebview2;
