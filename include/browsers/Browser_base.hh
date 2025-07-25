@@ -32,64 +32,67 @@ namespace gbw::browsers {
 class Browser_base {
 public:
   virtual ~Browser_base() = 0;
-  Browser_base() {}
+  Browser_base() = default;
 
 protected:
-  struct browser_api_layout_t : nested_api_t<Browser> {
-    browser_api_layout_t(Browser *self);
+  struct api_layout_t : nested_api_t<Browser> {
+    api_layout_t(Browser *self);
 
+    /// Fits the browser's rendered window to the Gtk::Window
     virtual void fit(layout_t &layout) = 0;
   };
 
-  struct browser_api_signals_t : nested_api_t<Browser_base> {
-    browser_api_signals_t(Browser_base *self);
+  struct api_signals_t : nested_api_t<Browser_base> {
+    api_signals_t(Browser_base *self);
 
-    /// The signal for the browser window ready event.
+    /// The signal for the browser core API ready event.
     ready_signal_t &core_ready();
 
-    /// The signal for the browser environment ready event.
+    /// The signal for the browser environment API ready event.
     ready_signal_t &env_ready();
 
-    /// The signal for the browser controller ready event.
+    /// The signal for the browser controller API ready event.
     ready_signal_t &controller_ready();
   };
 
-  struct browser_api_api_t : nested_api_t<Browser_base> {
-    browser_api_api_t(Browser_base *self);
+  struct api_api_t : nested_api_t<Browser_base> {
+    api_api_t(Browser_base *self);
 
     /// Gets the browser core API (ie. the window instance DOM/JS API)
     smart_core_t &core();
 
-    /// Gets the browser controller API (ie. the browser engine settings)
+    /// Gets the browser controller API (ie. the browser window settings)
     smart_control_t &controller();
 
     /// Gets the browser environment API (ie. the browser engine environment)
     smart_env_t &environment();
 
+    /// Flag for if all browser API's are loaded and ready
     bool ready();
   };
 
-  struct browser_api_t : nested_api_t<Browser> {
-    browser_api_t(Browser *self);
+  struct api_t : nested_api_t<Browser> {
+    api_t(Browser *self);
 
-    /// Initialises the browser engine and waits for completion signals.
+    /// Initialises the browser engine bootstrap sequence.
     virtual void init() = 0;
 
     /// Browser API branch for working with layout
-    browser_api_layout_t &layout;
-
-    browser_api_signals_t signals;
-
-    browser_api_api_t api;
+    api_layout_t &layout;
+    /// Browser API branch for working with signals
+    api_signals_t signals;
+    /// Browser api branch for working with browser engine API's
+    api_api_t api;
   };
 
+  /// Browser api_environment API mutator
   void set_api_environment(browser_env_t &env);
+  /// Browser api_controller API mutator
   void set_api_controller(browser_controller_t &controller);
+  /// Browser api_core API mutator
   void set_api_core(browser_core_t &core);
 
 private:
-  gdk_bounds_t bounds;
-
   smart_env_t api_environment;
   smart_control_t api_controller;
   smart_core_t api_core;
@@ -101,11 +104,8 @@ private:
   bool api_is_ready{};
 
   friend gbw::Browser;
-  friend struct browser_api_signals_t;
-  friend class gbw::browsers::Mswebview2;
+  friend struct api_signals_t;
 };
-
-inline Browser_base::~Browser_base() {}
 
 } // namespace gbw::browsers
 

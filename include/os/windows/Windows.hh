@@ -32,77 +32,76 @@
 namespace gbw {
 namespace os {
 
-/// @brief Library for interfacing with Windows OS system API.
-///
-/// @details We don't want to marry ourselves to Microsoft and the MSVC
-/// compiler, so replacement logic is provided for the `wil` and `wrl` framework
-/// MSVC only methods:
-/// - @ref gbw::os::windows::smart_ptr
-/// - @ref gbw::os::windows::Callback_handler
-/// @ref os/windows/types/types_winos.hh
 class Windows : public Os_base {
 public:
   virtual ~Windows() = 0;
   Windows() : os(this), api_window(this), api_layout(this) {};
 
+  /// Utility function to attach the console output to the Windows GUI app
+  /// process,
   static void attach_win32_console();
 
 private:
-  struct win_api_layout_t : public os_api_layout_t {
-    win_api_layout_t(Windows *self);
-
+  struct api_layout_t : public Os_base::api_layout_t {
+    api_layout_t(Windows *self);
+    /// Gets the pixel layout for the given HWND relative to the screen
     layout_t get(native_window_t &native_window) override;
-
+    /// Gets the top left pixel position for the given HWND relative to
+    /// the screen
     position_t get_position(native_window_t &native_window,
                             float dpi_scale) override;
-
+    /// Gets pixel size for the given HWND
     dimension_t get_size(native_window_t &native_window,
                          float dpi_scale) override;
-
+    /// Moves the given HWND to the new pixel origin relative to the
+    /// screen
     void move(native_window_t &native_window, layout_t &new_layout) override;
   };
 
-  struct win_api_window_t : public os_api_window_t {
-    win_api_window_t(Windows *self) : os_api_window_t(self) {};
+  struct api_window_t : public Os_base::api_window_t {
+    api_window_t(Windows *self);
 
+    /// Converts a `Gtk::Window` to an HWND
     native_window_t convert_gtk_to_native(gtk_window_t &window) override;
-
+    /// Gets the dpi scale for the given HWND
     float get_dpi_scale(native_window_t &native_window) override;
-
+    /// Get the top level HWND object
     native_window_t top_level() override;
-
+    /// Get the browser HWND object
     native_window_t browser() override;
   };
 
-  struct win_api_t : public os_api_t {
-    win_api_t(Windows *self);
+  struct api_t : public Os_base::api_t {
+    api_t(Windows *self);
 
+    /// Mutator that converts and sets the top level and browser `Gtk::Window`'s
+    /// to HWND's
     void set_native_windows(gtk_window_t &top_level,
                             gtk_window_t &browser) override;
   };
 
 protected:
   /// The gwb::os API root
-  win_api_t os;
+  api_t os;
 
 private:
   static bool is_console_attached;
 
-  win_api_window_t api_window;
-  win_api_layout_t api_layout;
-  // win_api_signals_t win_api_signals;
+  api_window_t api_window;
+  api_layout_t api_layout;
 
-  friend struct Os_base::os_api_t::os_api_t;
+  friend struct Os_base::api_t::api_t;
 };
 
 } // namespace os
 
 namespace options {
-
-/// Attach the windows console to the parent GUI process so that we can get
-/// debug output
-inline void attach_win32_console() { os::Windows::attach_win32_console(); }
-
+/// Static global MS Windows options
+struct win {
+  /// Attach the windows console to the parent GUI process so that we can get
+  /// debug output
+  static void attach_win32_console() { os::Windows::attach_win32_console(); }
+};
 } // namespace options
 } // namespace gbw
 

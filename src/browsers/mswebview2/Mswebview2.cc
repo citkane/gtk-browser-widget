@@ -33,18 +33,17 @@ Mswebview2::~Mswebview2() {}
 Mswebview2::Mswebview2(gbw_widget_t *widget, gbw_browser_t *engine)
     : Gbw_base(widget, engine), browser(this), layout_api(this) {};
 
-Mswebview2::mswebview_api_layout_t::mswebview_api_layout_t(Mswebview2 *self)
-    : browser_api_layout_t(self) {};
+Mswebview2::api_layout_t::api_layout_t(Mswebview2 *self)
+    : Browser_base::api_layout_t(self) {};
 
-void Mswebview2::mswebview_api_layout_t::fit(layout_t &layout) {
+void Mswebview2::api_layout_t::fit(layout_t &layout) {
   RECT const rect{0, 0, layout.width, layout.height};
   self->browser.api.controller()->put_Bounds(rect);
 };
 
-Mswebview2::mswebview_api_t::mswebview_api_t(Mswebview2 *self)
-    : browser_api_t(self) {};
+Mswebview2::api_t::api_t(Mswebview2 *self) : Browser_base::api_t(self) {};
 
-void Mswebview2::mswebview_api_t::init() {
+void Mswebview2::api_t::init() {
   std::cout << "Initialising MsWebview2 engine\n";
   self->browser.signals.env_ready().connect(
       [this] { self->create_browser_controller_and_core(); });

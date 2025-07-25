@@ -51,6 +51,24 @@ class Gbw_window;
 
 namespace types {
 
+constexpr Gdk::Event::Type FOCUS_CHANGE = Gdk::Event::Type::FOCUS_CHANGE;
+
+using gdk_event_t = const Glib::RefPtr<const Gdk::Event>;
+using gdk_bounds_t = std::optional<Gdk::Graphene::Rect>;
+using gdk_position_t = std::optional<Gdk::Graphene::Point>;
+
+using gtk_window_t = Gtk::Window;
+using gtk_widget_t = Gtk::Widget;
+
+using gbw_browser_t = gbw::core::Gbw_window;
+using gbw_widget_t = gbw::Gbw_widget;
+
+using ready_signal_t = sigc::signal<void()>;
+
+using smart_env_t = smart_ptr<browser_env_t>;
+using smart_control_t = smart_ptr<browser_controller_t>;
+using smart_core_t = smart_ptr<browser_core_t>;
+
 template <typename T> struct nested_api_t {
   nested_api_t(T *self) : self(self) {}
   T *self;
@@ -74,24 +92,6 @@ struct layout_eq_t {
   bool origin;
   bool size;
 };
-
-constexpr Gdk::Event::Type FOCUS_CHANGE = Gdk::Event::Type::FOCUS_CHANGE;
-
-using gdk_event_t = const Glib::RefPtr<const Gdk::Event>;
-using gdk_bounds_t = std::optional<Gdk::Graphene::Rect>;
-using gdk_position_t = std::optional<Gdk::Graphene::Point>;
-
-using gtk_window_t = Gtk::Window;
-using gtk_widget_t = Gtk::Widget;
-
-using gbw_browser_t = gbw::core::Gbw_window;
-using gbw_widget_t = gbw::Gbw_widget;
-
-using ready_signal_t = sigc::signal<void()>;
-
-using smart_env_t = smart_ptr<browser_env_t>;
-using smart_control_t = smart_ptr<browser_controller_t>;
-using smart_core_t = smart_ptr<browser_core_t>;
 
 } // namespace types
 } // namespace gbw

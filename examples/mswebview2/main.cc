@@ -61,9 +61,9 @@ int CALLBACK WinMain(_In_ HINSTANCE /*hInstance*/,
                      _In_ HINSTANCE /*hPrevInstance*/, _In_ LPSTR /*lpCmdLine*/,
                      _In_ int /*nCmdShow*/) {
 
-  gbw::options::attach_win32_console();
+  gbw::options::win::attach_win32_console();
   gbw::options::gtk::csd::set_fudge(0, -2);
-  // gbw::options::try_bypass_gtk_csd();
+  // gbw::options::gtk::csd::try_bypass();
 
 #else
 int main() {

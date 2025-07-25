@@ -39,7 +39,7 @@
 #include "browsers/mswebview2/lib/Controller.hh"
 #include "browsers/mswebview2/lib/Environment.hh"
 
-using namespace gbw::core::lib;
+using namespace gbw::core;
 namespace gbw::browsers {
 
 class Mswebview2 : mswebview2::Environment,
@@ -50,23 +50,24 @@ public:
   Mswebview2(gbw_widget_t *widget, gbw_browser_t *engine);
 
 private:
-  struct mswebview_api_t : browser_api_t {
-    mswebview_api_t(Mswebview2 *self);
-
+  struct api_t : Browser_base::api_t {
+    api_t(Mswebview2 *self);
+    /// Initialises the bootstrapping of the MsWebview2 browser engine
     void init() override;
   };
 
-  struct mswebview_api_layout_t : browser_api_layout_t {
-    mswebview_api_layout_t(Mswebview2 *self);
-
+  struct api_layout_t : Browser_base::api_layout_t {
+    api_layout_t(Mswebview2 *self);
+    /// Fits the MsWebview2 browser window into it's Gtk::Window parent
     void fit(layout_t &layout) override;
   };
 
 protected:
-  mswebview_api_t browser;
+  /// API root for the MsWebview2 browser
+  api_t browser;
 
 private:
-  mswebview_api_layout_t layout_api;
+  api_layout_t layout_api;
 
   void set_browser_env(browser_env_t &environment);
   void set_browser_controller(browser_controller_t &controller);

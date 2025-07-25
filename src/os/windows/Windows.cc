@@ -29,12 +29,12 @@ using namespace gbw::os;
 
 Windows::~Windows() {}
 
-/* #region os::layout */
+/* #region Windows::api_layout_t */
 
-Windows::win_api_layout_t::win_api_layout_t(Windows *self)
-    : os_api_layout_t(self) {};
+Windows::api_layout_t::api_layout_t(Windows *self)
+    : Os_base::api_layout_t(self) {};
 
-layout_t Windows::win_api_layout_t::get(HWND &hWnd) {
+layout_t Windows::api_layout_t::get(HWND &hWnd) {
   auto dpi_scale = self->os.window.get_dpi_scale(hWnd);
   auto position = self->os.layout.get_position(hWnd, dpi_scale);
   auto size = self->os.layout.get_size(hWnd, dpi_scale);
@@ -42,13 +42,12 @@ layout_t Windows::win_api_layout_t::get(HWND &hWnd) {
   return {position.x, position.y, size.width, size.height};
 }
 
-void Windows::win_api_layout_t::move(HWND &native_window, layout_t &layout) {
+void Windows::api_layout_t::move(HWND &native_window, layout_t &layout) {
   MoveWindow(native_window, layout.x, layout.y, layout.width, layout.width,
              FALSE);
 }
 
-position_t Windows::win_api_layout_t::get_position(HWND &hWnd,
-                                                   float dpi_scale) {
+position_t Windows::api_layout_t::get_position(HWND &hWnd, float dpi_scale) {
   POINT top_left = {0, 0};
   ClientToScreen(hWnd, &top_left);
   int y = round(top_left.y * dpi_scale);
@@ -56,7 +55,7 @@ position_t Windows::win_api_layout_t::get_position(HWND &hWnd,
   return {x, y};
 }
 
-dimension_t Windows::win_api_layout_t::get_size(HWND &hWnd, float dpi_scale) {
+dimension_t Windows::api_layout_t::get_size(HWND &hWnd, float dpi_scale) {
   RECT rect;
   GetWindowRect(hWnd, &rect);
   int width = round((rect.right - rect.left) * dpi_scale);
@@ -66,9 +65,12 @@ dimension_t Windows::win_api_layout_t::get_size(HWND &hWnd, float dpi_scale) {
 }
 
 /* #endregion */
-/* #region os::window */
+/* #region Windows::api_window_t */
 
-HWND Windows::win_api_window_t::convert_gtk_to_native(gtk_window_t &window) {
+Windows::api_window_t::api_window_t(Windows *self)
+    : Os_base::api_window_t(self) {};
+
+HWND Windows::api_window_t::convert_gtk_to_native(gtk_window_t &window) {
   auto surface = window.get_native()->get_surface();
   if (!surface->gobj()) {
     throw gbw_error("Failed to get surface from Gtk:Window");
@@ -82,7 +84,7 @@ HWND Windows::win_api_window_t::convert_gtk_to_native(gtk_window_t &window) {
   return hWnd;
 }
 
-float Windows::win_api_window_t::get_dpi_scale(HWND &hWnd) {
+float Windows::api_window_t::get_dpi_scale(HWND &hWnd) {
   // Try Windows 10+ API: GetDpiForWindow
   // Windows 10+ implements per monitor dpi and other features, so we can't rely
   // on the fallback for a fully integrated experience.
@@ -111,14 +113,14 @@ float Windows::win_api_window_t::get_dpi_scale(HWND &hWnd) {
   return dpi / 96.0f;
 }
 
-native_window_t Windows::win_api_window_t::top_level() {
+native_window_t Windows::api_window_t::top_level() {
   if (!self->top_level_window) {
     throw gbw_error("Top level native window was not set");
   }
   return self->top_level_window;
 };
 
-native_window_t Windows::win_api_window_t::browser() {
+native_window_t Windows::api_window_t::browser() {
   if (!self->browser_window) {
     throw gbw_error("Browser native window was not set");
   }
@@ -126,12 +128,12 @@ native_window_t Windows::win_api_window_t::browser() {
 };
 
 /* #endregion */
+/* #region Windows::api_t */
 
-/* #region os::os */
-Windows::win_api_t::win_api_t(Windows *self) : os_api_t(self) {}
+Windows::api_t::api_t(Windows *self) : Os_base::api_t(self) {}
 
-void Windows::win_api_t::set_native_windows(gtk_window_t &top_level,
-                                            gtk_window_t &browser) {
+void Windows::api_t::set_native_windows(gtk_window_t &top_level,
+                                        gtk_window_t &browser) {
   if (!top_level.gobj()) {
     throw gbw_error("No top level window");
   }
@@ -156,7 +158,8 @@ void Windows::attach_win32_console() {
     freopen("CONOUT$", "w", stderr);
     freopen("CONIN$", "r", stdin);
 
-    printf("The Windows console has been attached to the parent process.\n");
+    std::cout
+        << "The Windows console has been attached to the parent process.\n";
   }
 }
 bool Windows::is_console_attached{};

@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-#include "Gbw_widget.hh" // IWYU pragma: keep
 #include "core/Gbw_base.hh"
+#include "Gbw_widget.hh" // IWYU pragma: keep
 
-
-using namespace gbw::core::lib;
+using namespace gbw::core;
 
 /* #region Gbw_base */
 Gbw_base::~Gbw_base() {}
@@ -37,12 +36,11 @@ Gbw_base::Gbw_base(gbw_widget_t *widget, gbw_browser_t *engine)
 position_t Gbw_base::csd_fudge{0, 0};
 
 /* #endregion */
-/* #region Gbw_base::gbw::layout */
+/* #region Gbw_base::api_layout_t */
 
-Gbw_base::gbw_api_layout_t::gbw_api_layout_t(Gbw_base *self)
-    : nested_api_t(self) {};
+Gbw_base::api_layout_t::api_layout_t(Gbw_base *self) : nested_api_t(self) {};
 
-layout_t Gbw_base::gbw_api_layout_t::get_rel() {
+layout_t Gbw_base::api_layout_t::get_rel() {
 
   auto bounds = self->widget->compute_bounds(*self->gbw.window.top_level());
 
@@ -54,7 +52,7 @@ layout_t Gbw_base::gbw_api_layout_t::get_rel() {
   return {x, y, width, height};
 }
 
-layout_t Gbw_base::gbw_api_layout_t::get_new() {
+layout_t Gbw_base::api_layout_t::get_new() {
   auto native_window = self->os.window.top_level();
   auto rel_layout = self->gbw.layout.get_rel();
   auto abs_layout = self->os.layout.get(native_window);
@@ -64,8 +62,8 @@ layout_t Gbw_base::gbw_api_layout_t::get_new() {
   return {x, y, rel_layout.width, rel_layout.height};
 };
 
-layout_eq_t Gbw_base::gbw_api_layout_t::has_changed(layout_t &new_layout,
-                                                    layout_t &current_layout) {
+layout_eq_t Gbw_base::api_layout_t::has_changed(layout_t &new_layout,
+                                                layout_t &current_layout) {
   auto origin_changed =
       (new_layout.x != current_layout.x) || (new_layout.y != current_layout.y);
   auto size_changed = (new_layout.width != current_layout.width) ||
@@ -74,32 +72,29 @@ layout_eq_t Gbw_base::gbw_api_layout_t::has_changed(layout_t &new_layout,
   return {origin_changed, size_changed};
 };
 
-void Gbw_base::gbw_api_layout_t::size_browser(layout_t &layout) {
+void Gbw_base::api_layout_t::size_browser(layout_t &layout) {
   self->gbw.window.browser()->set_default_size(layout.width, layout.height);
 };
 
 /* #endregion */
-/* #region Gbw_base::gbw */
+/* #region Gbw_base::api_t */
 
-Gbw_base::gbw_api_t::gbw_api_t(Gbw_base *self)
+Gbw_base::api_t::api_t(Gbw_base *self)
     : nested_api_t(self), window(self), csd(self), layout(self), signals(self) {
 }
 
-bool Gbw_base::gbw_api_t::windows_are_ready() {
-  return self->windows_are_ready;
-};
+bool Gbw_base::api_t::windows_are_ready() { return self->windows_are_ready; };
 
-void Gbw_base::gbw_api_t::windows_are_ready(bool flag) {
+void Gbw_base::api_t::windows_are_ready(bool flag) {
   self->windows_are_ready = flag;
 };
 
 /* #endregion */
-/* #region Gbw_base::gbw::window */
+/* #region Gbw_base::api_window_t */
 
-Gbw_base::gbw_api_window_t::gbw_api_window_t(Gbw_base *self)
-    : nested_api_t(self) {};
+Gbw_base::api_window_t::api_window_t(Gbw_base *self) : nested_api_t(self) {};
 
-gtk_window_t *Gbw_base::gbw_api_window_t::top_level() {
+gtk_window_t *Gbw_base::api_window_t::top_level() {
   if (!self->top_level_window) {
     auto root_ptr = self->widget->get_root();
     auto window = dynamic_cast<gtk_window_t *>(root_ptr);
@@ -108,7 +103,7 @@ gtk_window_t *Gbw_base::gbw_api_window_t::top_level() {
   return self->top_level_window;
 };
 
-gtk_window_t *Gbw_base::gbw_api_window_t::browser() {
+gtk_window_t *Gbw_base::api_window_t::browser() {
   if (!self->browser_window) {
     self->browser_window = static_cast<gtk_window_t *>(self->engine);
   }
@@ -116,9 +111,9 @@ gtk_window_t *Gbw_base::gbw_api_window_t::browser() {
 };
 
 /* #endregion */
-/* #region Gbw_base::gbw::csd */
+/* #region Gbw_base::api_csd_t */
 
-bool Gbw_base::gbw_api_csd_t::is_active() {
+bool Gbw_base::api_csd_t::is_active() {
   auto window = self->gbw.window.top_level();
   auto is_application = !!window->get_application();
   auto has_titlebar = !!window->get_titlebar();
@@ -139,11 +134,11 @@ bool Gbw_base::gbw_api_csd_t::is_active() {
   return true;
 }
 
-Gbw_base::gbw_api_csd_t::gbw_api_csd_t(Gbw_base *self) : nested_api_t(self) {};
+Gbw_base::api_csd_t::api_csd_t(Gbw_base *self) : nested_api_t(self) {};
 
-position_t &Gbw_base::gbw_api_csd_t::fudge() { return self->csd_fudge; }
+position_t &Gbw_base::api_csd_t::fudge() { return self->csd_fudge; }
 
-position_t Gbw_base::gbw_api_csd_t::get_offset(layout_t native) {
+position_t Gbw_base::api_csd_t::get_offset(layout_t native) {
   auto gtk = self->gbw.window.top_level();
   if (gtk->is_maximized() || !gtk->is_active()) {
     return {0, 0};
@@ -151,6 +146,7 @@ position_t Gbw_base::gbw_api_csd_t::get_offset(layout_t native) {
 
   auto gtk_width = gtk->get_allocated_width();
   auto gtk_height = gtk->get_allocated_height();
+
   // Half the total decoration size in each direction gives us a best estimate
   // xy origin adjustment. We may still need to apply an additional
   // user provided fudge depending on the asymmetry of any given theme.
@@ -161,41 +157,14 @@ position_t Gbw_base::gbw_api_csd_t::get_offset(layout_t native) {
 }
 
 /* #endregion */
-/* #region Gbw_base::gbw::signals */
+/* #region Gbw_base::api_signals_t */
 
-Gbw_base::gbw_api_signals_t::gbw_api_signals_t(Gbw_base *self)
-    : nested_api_t(self) {}
+Gbw_base::api_signals_t::api_signals_t(Gbw_base *self) : nested_api_t(self) {}
 
-ready_signal_t Gbw_base::gbw_api_signals_t::windows_are_ready() {
+ready_signal_t Gbw_base::api_signals_t::windows_are_ready() {
   return self->windows_are_ready_signal;
 }
 
 /* #endregion */
+
 void Gbw_base::fudge(int x, int y) { Gbw_base::csd_fudge = {x, y}; };
-
-// position_t Windows::win_api_window_t::csd_decorations_offset_imp(
-//     HWND &hWnd, gtk_window_t &window, position_t &fudge) {
-//   if (window.is_maximized() || !is_using_gtk_csd(window)) {
-//     return {0, 0};
-//   }
-//   // Get the HWND browser window size in scaled pixels
-//   RECT rect;
-//   GetWindowRect(hWnd, &rect);
-//   auto scale = native_window_dpi_scale_imp(hWnd);
-//   float wr_w = (rect.right - rect.left) * scale;
-//   float wr_h = (rect.bottom - rect.top) * scale;
-//   // Get the Gtk::Window browser size
-//   auto tl_w = window.get_allocated_width();
-//   auto tl_h = window.get_allocated_height();
-//   // Half the total decoration size in each direction gives us a best
-//   estimate
-//   // additional xy origin adjustment. We may still need to apply an
-//   additional
-//   // user provided fudge depending on the asymmetary of any given theme.
-//   int dec_x = floor(float(wr_w - tl_w) / 2) + fudge.x;
-//   int dec_y = floor(float(wr_h - tl_h) / 2) + fudge.y;
-//
-//   return {dec_x, dec_y};
-// }
-
-/* #endregion */

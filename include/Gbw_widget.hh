@@ -44,13 +44,23 @@ public:
     Gtk::manage(this);
     init_widget_layout();
   };
-
+  /// The signal that the browser API is ready to use.
+  ///
+  /// Example Usage:
+  /// ```c++
+  /// widget_instance.ready().connect([this]{
+  ///     auto api = widget_instance.api_core();
+  ///     api.Navigate(...);
+  ///     ...etc...
+  /// })
+  /// ```
   ready_signal_t &ready() { return engine.browser.signals.core_ready(); }
 
+  /// Gets the browser core API (ie. the window instance DOM/JS API)
   auto &api_core() { return engine.browser.api.core(); }
-
+  /// Gets the browser controller API (ie. the browser window settings)
   auto &api_controller() { return engine.browser.api.controller(); }
-
+  /// Gets the browser environment API (ie. the browser engine environment)
   auto &api_env() { return engine.browser.api.environment(); }
 
 private:

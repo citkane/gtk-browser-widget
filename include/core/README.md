@@ -151,7 +151,7 @@ classDiagram
     }
 
     namespace gbw_os_Os {
-      class Lib_mac["gbw::os::Lib_mac"]:::gbw {
+      class Lib_mac["gbw::os::Mac"]:::gbw {
         <<API os.*>>
         #Os::api_t os
         
@@ -162,7 +162,7 @@ classDiagram
         #Browser::api_t common_methods()
         #Browser::api_t virtual_declarations()*
       }
-      class Lib_win["gbw::os::Lib_win"]:::gbw {
+      class Lib_win["gbw::os::Windows"]:::gbw {
         <<API os.*>>
         #Os::api_t os
         
@@ -173,7 +173,7 @@ classDiagram
         #Browser::api_t common_methods()
         #Browser::api_t virtual_declarations()*
       }
-      class Lib_linux["gbw::os::Lib_linux"]:::gbw {
+      class Lib_linux["gbw::os::Linux"]:::gbw {
         <<API os.*>>
         #Os::api_t os
         

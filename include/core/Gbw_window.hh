@@ -44,12 +44,16 @@ private:
   layout_t current_layout{0, 0, 0, 0};
 
   /// Callback for `gtk_window_t.signal_realize`
+  ///
+  /// @note The `Gtk::Window` is not yet an accessible object at this stage.
   void window_realised_cb();
-  /// Callback for when the browser window is realised and present on screen
+
+  /// Callback for when the browser window is realised and accessible
   ///
   /// @note This is triggered by `Glib::signal_idle().connect_once` nested
-  /// within `gtk_window_t.signal_realize`. The `Gtk::Window`s  are now realised
-  /// AND shown, so we correctly catch the application bootstrap sequence
+  /// within `gtk_window_t.signal_realize`. The `Gtk::Window`'s  are now
+  /// realised AND accessible, so we can correctly access the application
+  /// bootstrap sequence
   void window_ready_cb();
 
   /// Sets the initial GTK properties for the @ref Gbw_window
@@ -59,15 +63,15 @@ private:
   /// the native browser window when the input switches.
   void set_focus_controller();
 
-  /// Determines UI position and size changes on the @ref gbw::Gbw_widget
-  /// instance and applies them to the @ref gbw::gtk::Gbw_window instance
-  /// and it's contained browser display.
+  /// Updates UI position and size changes on the @ref Gbw_window
+  /// instance and it's contained browser display.
   ///
   /// @note Since GTK 4 we can no longer embed a `Gtk::Window` as a child of
   /// another `Gtk::Window`, so we need to implement a pseudo-embed by tracking
-  /// UI changes and then natively pass them to pseudo-children.
+  /// UI changes on the @ref gbw::Gbw_widget and natively implement them on the
+  /// `Gbw_window`.
   ///
-  /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
+  /// @param new_layout The updated `Gbw_widget`layout.
   void layout_update(layout_t &new_layout);
 
   friend class gbw::Gbw_widget;

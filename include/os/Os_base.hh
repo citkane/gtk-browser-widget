@@ -38,13 +38,14 @@ public:
   Os_base() = default;
 
 protected:
-  struct os_api_layout_t : nested_api_t<Os> {
-    os_api_layout_t(Os *self);
+  struct api_layout_t : nested_api_t<Os> {
+    api_layout_t(Os *self);
 
     /// Gets the pixel layout for the given native window relative to the screen
     virtual layout_t get(native_window_t &native_window) = 0;
 
-    /// Gets the top left pixel position for the given native window
+    /// Gets the top left pixel position for the given native window relative to
+    /// the screen
     virtual position_t get_position(native_window_t &native_window,
                                     float dpi_scale) = 0;
 
@@ -57,10 +58,10 @@ protected:
     virtual void move(native_window_t &native_window, layout_t &new_layout) = 0;
   };
 
-  struct os_api_window_t : nested_api_t<Os> {
-    os_api_window_t(Os *self);
+  struct api_window_t : nested_api_t<Os> {
+    api_window_t(Os *self);
+
     /// Converts a `Gtk::Window` to an OS native window
-    /// @throws exception if conversion fails.
     virtual native_window_t convert_gtk_to_native(gtk_window_t &window) = 0;
 
     /// Gets the dpi scale for the given native window
@@ -73,28 +74,29 @@ protected:
     virtual native_window_t browser() = 0;
   };
 
-  struct os_api_signals_t : nested_api_t<Os_base> {
-    os_api_signals_t(Os_base *self);
+  struct api_signals_t : nested_api_t<Os_base> {
+    api_signals_t(Os_base *self);
 
     /// The signal for the Os native windows ready event.
     ready_signal_t &native_windows_ready();
   };
 
-  struct os_api_t : nested_api_t<Os> {
-    os_api_t(Os *self);
+  struct api_t : nested_api_t<Os> {
+    api_t(Os *self);
 
-    /// OS API for working with native windows
-    os_api_window_t &window;
-
-    /// OS API for working with native window layouts
-    os_api_layout_t &layout;
-
-    os_api_signals_t signals;
-
+    /// API root for working with OS native windows
+    api_window_t &window;
+    /// API root for working with OS native window layouts
+    api_layout_t &layout;
+    /// API root for OS related signals
+    api_signals_t signals;
+    /// Mutator that converts and sets the top level and browser `Gtk::Window`'s
+    /// to OS native windows
     virtual void set_native_windows(gtk_window_t &top_level,
                                     gtk_window_t &browser) = 0;
   };
 
+  /// Mutator that sets the top level and browser OS native windows
   void set_native_windows(native_window_t &top_level, native_window_t &browser);
 
 private:
