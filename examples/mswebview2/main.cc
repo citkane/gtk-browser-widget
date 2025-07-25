@@ -6,8 +6,7 @@
 #include <gtkmm/paned.h>
 #include <gtkmm/popovermenubar.h>
 
-#include "Browser_widget.hh"
-#include "core/lib/Lib_gbw.hh"
+#include "Gbw_widget.hh"
 
 class Application : public Gtk::ApplicationWindow {
 public:
@@ -33,7 +32,7 @@ public:
   };
 
 private:
-  gbw::Browser_widget browser;
+  gbw::Gbw_widget browser;
   Gtk::PopoverMenuBar m_menubar;
   Gtk::Box m_vbox{Gtk::Orientation::VERTICAL};
   Gtk::Paned m_paned{Gtk::Orientation::HORIZONTAL};

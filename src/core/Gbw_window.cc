@@ -26,26 +26,25 @@
 #include <gtkmm/eventcontrollerfocus.h>
 #include <gtkmm/eventcontrollerlegacy.h>
 
-#include "core/Browser_window.hh"
+#include "core/Gbw_window.hh"
 #include "types/types.hh"
 
 using namespace gbw::core;
 
-Browser_window::~Browser_window() {
-  std::cout << "Destroying Browser_window" << std::endl;
+Gbw_window::~Gbw_window() {
+  std::cout << "Destroying Gbw_window" << std::endl;
   browser.api.controller()->Close();
-  std::cout << "Destroyed Browser_window" << std::endl;
+  std::cout << "Destroyed Gbw_window" << std::endl;
 }
 
-Browser_window::Browser_window(gbw_widget_t *widget)
-    : Browser_engine(widget, this) {
+Gbw_window::Gbw_window(gbw_widget_t *widget) : Browser(widget, this) {
   Gtk::manage(this);
 
   browser.init();
   browser_window_init_config();
 };
 
-void Browser_window::browser_window_init_config() {
+void Gbw_window::browser_window_init_config() {
   signal_realize().connect([this] { window_realised_cb(); });
 
   set_default_size(0, 0);
@@ -61,12 +60,12 @@ void Browser_window::browser_window_init_config() {
   set_visible(false);
 }
 
-void Browser_window::window_realised_cb() {
+void Gbw_window::window_realised_cb() {
   std::cout << "- Browser window is realised\n";
   Glib::signal_idle().connect_once([this] { window_ready_cb(); });
 }
 
-void Browser_window::window_ready_cb() {
+void Gbw_window::window_ready_cb() {
   std::cout << "- Browser window is ready\n";
   os.set_native_windows(*gbw.window.top_level(), *gbw.window.browser());
   set_focus_controller();
@@ -90,7 +89,7 @@ void Browser_window::window_ready_cb() {
   gbw.signals.windows_are_ready().emit();
 }
 
-void Browser_window::set_focus_controller() {
+void Gbw_window::set_focus_controller() {
   auto focus_controller = Gtk::EventControllerLegacy::create();
   add_controller(focus_controller);
 
@@ -106,7 +105,7 @@ void Browser_window::set_focus_controller() {
       true);
 };
 
-void Browser_window::layout_update(layout_t &new_layout) {
+void Gbw_window::layout_update(layout_t &new_layout) {
   auto change = gbw.layout.has_changed(new_layout, current_layout);
   if (!change.origin && !change.size) {
     return;

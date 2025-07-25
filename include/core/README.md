@@ -4,11 +4,11 @@
 # Gtk
 This folder is for integrations and presentation of the browser engine window into a `Gtk::Window`
 
-## Browser_window.hh
+## Gbw_window.hh
 Provides the top level `Gtk::Window` instance that will wrap the native browser engine window.
 
-## Browser_engine.hh
-Header file that uses pragma guards to include the relevant browser engine class header. The included browser header file MUST alias it's class to `gbw::browser::Browser_engine`
+## Browser.hh
+Header file that uses pragma guards to include the relevant browser engine class header. The included browser header file MUST alias it's class to `gbw::browser::Browser`
 
 ## Class Hierarchy
 ```mermaid
@@ -19,30 +19,30 @@ config:
     hideEmptyMembersBox: true
 ---
 classDiagram
-    Browser_widget --* User_application
+    Gbw_widget --* User_application
     User_application <|-- Application
 
-    Browser_widget <|-- Widget
-    Browser_window <|-- Window
+    Gbw_widget <|-- Widget
+    Gbw_window <|-- Window
     
-    Browser_widget *--* Browser_window : *browser_window<br>*browser_widget
+    Gbw_widget *--* Gbw_window : <- *engine<br>*widget ->
 
-    Webkit <|-- Lib_gtk
-    Chromium <|-- Lib_gtk
-    MsWebview2 <|-- Lib_gtk
+    Webkit <|-- Gbw_base
+    Chromium <|-- Gbw_base
+    MsWebview2 <|-- Gbw_base
 
-    Browser_window <|-- Webkit  : or
-    Browser_window <|-- Chromium : or
-    Browser_window <|-- MsWebview2 : or
+    Gbw_window <|-- Webkit  : or
+    Gbw_window <|-- Chromium : or
+    Gbw_window <|-- MsWebview2 : or
 
-    Lib_gtk <|-- Lib_win : or
-    Lib_gtk <|-- Lib_mac : or
-    Lib_gtk <|-- Lib_linux : or
+    Gbw_base <|-- Lib_win : or
+    Gbw_base <|-- Lib_mac : or
+    Gbw_base <|-- Lib_linux : or
     
-    Lib_win <|-- Lib_os
-    Lib_mac <|-- Lib_os
-    Lib_linux <|-- Lib_os
-    Lib_os <|-- Lib_browser
+    Lib_win <|-- Os_base
+    Lib_mac <|-- Os_base
+    Lib_linux <|-- Os_base
+    Os_base <|-- Browser_base
     
     namespace Gtk {
       class Widget["Gtk::Widget"]:::other {
@@ -56,89 +56,159 @@ classDiagram
     namespace User_entry {
       class Application["Gtk::Application"]:::other
       class User_application:::other {
-        -Browser_widget gbw_widget
-      }
-    }
-    
-    namespace virtual_declarations {
-      class Lib_browser["gbw::browsers::Lib_browser"]:::gbw {
-        <<Abstract>> 
-        #virtual browser_declarations()*
-      } 
-      
-      class Lib_os["gbw::os::Lib_os"]:::gbw {
-        <<Abstract>>
-        #virtual_OS declarations()*
+        -Gbw_widget gbw_widget
       }
     }
 
-    namespace gbw_custom_Gtk {
-      class Browser_widget["gbw::Browser_widget"]:::gbw {
-          +sigc::signal ready()
-          +Browser_core::apis get_browser_apis()
-          #Gtk::Widget methods()
-          -Browser_engine *browser_engine
+    namespace Custom_Gtk {
+      class Gbw_widget["gbw::Gbw_widget"]:::gbw {
+          +Browser::api_t browser
+
+          -Gbw_Window *engine
+          -Os::api_t engine->os
+          -Gbw_base::api_t engine->gbw
+
+          #Browser::api_t get_browser_api()
+          -Gtk::Widget methods()
       }
 
-      class Browser_window["gbw::gtk::Browser_window"]:::gbw {
-        +Browser_window(Browser_widget *widget)
-        #Gtk::Window methods()
-        #gbw::gtk methods()
-        #OS methods()
-        #Browser methods()
+      class Gbw_window["gbw::core::Gbw_window"]:::gbw {
+          +Gbw_window(Gbw_widget *widget)
+
+          #Browser::api_t browser
+          #Os::api_t os
+          #Gbw_base::api_t gbw
+
+          #Gbw_base accessors()           
+          #Os accessors()        
+          #Browser accessors()
+          
+          -Gtk::Window methods()
       }
     }
 
-    class Lib_gtk["gbw::gtk::Lib_gtk"]:::gbw {
-      +Lib_gtk(Browser_widget *widget, Browser_window *window)
-      -gbw::Browser_widget *widget
-      -gbw::Browser_window *window
-      #gbw::gtk methods()
-      #OS methods()
-      #Browser methods()
-    }
+    namespace gbw_browser_Browser {
+          class Webkit["gbw::browsers::Webkit"]:::gbw {
+          +Webkit(Gbw_widget *widget, Gbw_window *window)
 
-    namespace OS {
-      class Lib_mac["gbw::os::mac::Lib_mac"]:::gbw {
-        #gbw::gtk methods()
-        #virtual_OS impls()*
-      }
-      class Lib_win["gbw::os::win::Lib_win"]:::gbw {
-        #gbw::gtk methods()
-        #virtual_OS impls()*
-      }
-      class Lib_linux["gbw::os::linuz::Lib_linux"]:::gbw {
-        #gbw::gtk methods()
-        #Browser methods()
-        #virtual_OS impls()*
-      }
-    }
+          #Browser::api_t browser
+          #Os::api_t os
+          #Gbw_base::api_t gbw
 
-    namespace gbw_Browser_classes {
-          class Webkit["gbw::browsers::webkit"]:::gbw {
-          +api environment_API()
-          +api controller_API()
-          +api core_API()
-          #gbw::gtk methods()
-          #OS methods()
-          #virtual_Browser impls()*
+          #Gbw_base accessors()           
+          #Os accessors()
+          #Browser accessors()
+          #Browser::api_t virtual_implementations()*
         }
-        class MsWebview2["gbw::browsers::mswebview2"]:::gbw {
-          +api environment_API()
-          +api controller_API()
-          +api core_API()
-          #gbw::gtk methods()
-          #OS methods()          
-          #virtual_Browser impls()*
+
+        class MsWebview2["gbw::browsers::MsWebview2"]:::gbw {
+          +MsWebview2(Gbw_widget *widget, Gbw_window *window)
+
+          #Browser::api_t browser
+          #Os::api_t os
+          #Gbw_base::api_t gbw
+
+          #Gbw_base accessors()           
+          #Os accessors()
+        
+          #Browser accessors()
+          #Browser::api_t virtual_implementations()**
         }
-        class Chromium["gbw::browsers::chromium"]:::gbw {
-          +api environment_API()
-          +api controller_API()
-          +api core_API()
-          #gbw::gtk methods()
-          #OS methods()          
-          #virtual_Browser impls()*
+
+        class Chromium["gbw::browsers::Chromium"]:::gbw {
+          +Chromium(Gbw_widget *widget, Gbw_window *window)
+
+          #Browser::api_t browser
+          #Os::api_t os
+          #Gbw_base::api_t gbw
+
+          #Gbw_base accessors()          
+          #Os accessors()
+        
+          #Browser accessors()
+          #Browser::api_t virtual_implementations()*
         }
+    }
+
+    class Gbw_base["gbw::core::Gbw_base"]:::gbw {
+        +Gbw_base(Gbw_widget *widget, Gbw_window *window)
+        
+        #Os::api_t os
+        #Gbw_base::api_t gbw
+        
+        -Gbw_widget *widget
+        -Gbw_window *window
+        -Gbw_base vars
+
+        #Gbw_base accessors()
+        #Gbw_base::api_t methods()
+        
+        #Os accessors()
+
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+    }
+
+    namespace gbw_os_Os {
+      class Lib_mac["gbw::os::Lib_mac"]:::gbw {
+        <<API os.*>>
+        #Os::api_t os
+        
+        #Os accessors()
+        #Os::api_t virtual_implementations()*
+        
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+      }
+      class Lib_win["gbw::os::Lib_win"]:::gbw {
+        <<API os.*>>
+        #Os::api_t os
+        
+        #Os accessors()
+        #Os::api_t virtual_implementations()*
+        
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+      }
+      class Lib_linux["gbw::os::Lib_linux"]:::gbw {
+        <<API os.*>>
+        #Os::api_t os
+        
+        #Os accessors()
+        #Os::api_t virtual_implementations()*
+        
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+      }
+    }
+
+    namespace Base_classes {
+ 
+      class Os_base["gbw::os::Os_base"]:::gbw {
+        <<Base>>
+        -Os vars
+        
+        #Os accessors()
+        #Os::api_t common_methods() 
+        #Os::api_t virtual_declarations()*
+        
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+      }
+
+      class Browser_base["gbw::browsers::Browser_base"]:::gbw {
+        <<Base>> 
+        -Browser vars
+        
+        #Browser accessors()
+        #Browser::api_t common_methods()
+        #Browser::api_t virtual_declarations()*
+      }
     }
 
     classDef gbw fill:#FCF5FF, stroke:#343238 

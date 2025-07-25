@@ -26,11 +26,11 @@
 #define GBW_OS_WINDOWS_WINDOWS_HH
 #ifdef _WIN32
 
-#include "os/lib/Lib_os.hh"
+#include "os/Os_base.hh"
 #include "types/types.hh"
 
 namespace gbw {
-namespace os::windows {
+namespace os {
 
 /// @brief Library for interfacing with Windows OS system API.
 ///
@@ -40,7 +40,7 @@ namespace os::windows {
 /// - @ref gbw::os::windows::smart_ptr
 /// - @ref gbw::os::windows::Callback_handler
 /// @ref os/windows/types/types_winos.hh
-class Windows : public Lib_os {
+class Windows : public Os_base {
 public:
   virtual ~Windows() = 0;
   Windows() : os(this), api_window(this), api_layout(this) {};
@@ -92,19 +92,16 @@ private:
   win_api_layout_t api_layout;
   // win_api_signals_t win_api_signals;
 
-  friend struct Lib_os::os_api_t::os_api_t;
+  friend struct Os_base::os_api_t::os_api_t;
+};
 
-}; // namespace gbw
-
-} // namespace os::windows
+} // namespace os
 
 namespace options {
 
 /// Attach the windows console to the parent GUI process so that we can get
 /// debug output
-inline void attach_win32_console() {
-  os::windows::Windows::attach_win32_console();
-}
+inline void attach_win32_console() { os::Windows::attach_win32_console(); }
 
 } // namespace options
 } // namespace gbw

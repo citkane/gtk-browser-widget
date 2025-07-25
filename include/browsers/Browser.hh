@@ -22,16 +22,11 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_BROWSERS_LIB_INCLUDES_HH
-#define GBW_BROWSERS_LIB_INCLUDES_HH
+#ifndef GBW_BROWSERS_BROWSER_HH
+#define GBW_BROWSERS_BROWSER_HH
 
 #ifdef GBW_MSWEBVIEW2
+#include "browsers/mswebview2/Mswebview2.hh" // IWYU pragma: keep
+#endif                                       // GBW_MSWEBVIEW2
 
-#include "browsers/mswebview2/Ms_Webview2.hh" // IWYU pragma: keep
-using namespace gbw::browsers::mswebview2;
-namespace gbw {
-using Browser_engine = gbw::browsers::mswebview2::Ms_Webview2;
-}
-
-#endif // GBW_MSWEBVIEW2
-#endif // GBW_BROWSERS_LIB_INCLUDES_HH
+#endif // GBW_BROWSERS_BROWSER_HH

@@ -22,26 +22,27 @@
  * SOFTWARE.
  */
 
-#include "core/lib/Lib_gbw.hh"
-#include "Browser_widget.hh" // IWYU pragma: keep
+#include "Gbw_widget.hh" // IWYU pragma: keep
+#include "core/Gbw_base.hh"
+
 
 using namespace gbw::core::lib;
 
-/* #region Lib_gbw */
-Lib_gbw::~Lib_gbw() {}
+/* #region Gbw_base */
+Gbw_base::~Gbw_base() {}
 
-Lib_gbw::Lib_gbw(gbw_widget_t *widget, gbw_browser_t *engine)
+Gbw_base::Gbw_base(gbw_widget_t *widget, gbw_browser_t *engine)
     : widget(widget), engine(engine), gbw(this) {};
 
-position_t Lib_gbw::csd_fudge{0, 0};
+position_t Gbw_base::csd_fudge{0, 0};
 
 /* #endregion */
-/* #region Lib_gbw::gbw::layout */
+/* #region Gbw_base::gbw::layout */
 
-Lib_gbw::gbw_api_layout_t::gbw_api_layout_t(Lib_gbw *self)
+Gbw_base::gbw_api_layout_t::gbw_api_layout_t(Gbw_base *self)
     : nested_api_t(self) {};
 
-layout_t Lib_gbw::gbw_api_layout_t::get_rel() {
+layout_t Gbw_base::gbw_api_layout_t::get_rel() {
 
   auto bounds = self->widget->compute_bounds(*self->gbw.window.top_level());
 
@@ -53,7 +54,7 @@ layout_t Lib_gbw::gbw_api_layout_t::get_rel() {
   return {x, y, width, height};
 }
 
-layout_t Lib_gbw::gbw_api_layout_t::get_new() {
+layout_t Gbw_base::gbw_api_layout_t::get_new() {
   auto native_window = self->os.window.top_level();
   auto rel_layout = self->gbw.layout.get_rel();
   auto abs_layout = self->os.layout.get(native_window);
@@ -63,8 +64,8 @@ layout_t Lib_gbw::gbw_api_layout_t::get_new() {
   return {x, y, rel_layout.width, rel_layout.height};
 };
 
-layout_eq_t Lib_gbw::gbw_api_layout_t::has_changed(layout_t &new_layout,
-                                                   layout_t &current_layout) {
+layout_eq_t Gbw_base::gbw_api_layout_t::has_changed(layout_t &new_layout,
+                                                    layout_t &current_layout) {
   auto origin_changed =
       (new_layout.x != current_layout.x) || (new_layout.y != current_layout.y);
   auto size_changed = (new_layout.width != current_layout.width) ||
@@ -73,32 +74,32 @@ layout_eq_t Lib_gbw::gbw_api_layout_t::has_changed(layout_t &new_layout,
   return {origin_changed, size_changed};
 };
 
-void Lib_gbw::gbw_api_layout_t::size_browser(layout_t &layout) {
+void Gbw_base::gbw_api_layout_t::size_browser(layout_t &layout) {
   self->gbw.window.browser()->set_default_size(layout.width, layout.height);
 };
 
 /* #endregion */
-/* #region Lib_gbw::gbw */
+/* #region Gbw_base::gbw */
 
-Lib_gbw::gbw_api_t::gbw_api_t(Lib_gbw *self)
+Gbw_base::gbw_api_t::gbw_api_t(Gbw_base *self)
     : nested_api_t(self), window(self), csd(self), layout(self), signals(self) {
 }
 
-bool Lib_gbw::gbw_api_t::windows_are_ready() {
+bool Gbw_base::gbw_api_t::windows_are_ready() {
   return self->windows_are_ready;
 };
 
-void Lib_gbw::gbw_api_t::windows_are_ready(bool flag) {
+void Gbw_base::gbw_api_t::windows_are_ready(bool flag) {
   self->windows_are_ready = flag;
 };
 
 /* #endregion */
-/* #region Lib_gbw::gbw::window */
+/* #region Gbw_base::gbw::window */
 
-Lib_gbw::gbw_api_window_t::gbw_api_window_t(Lib_gbw *self)
+Gbw_base::gbw_api_window_t::gbw_api_window_t(Gbw_base *self)
     : nested_api_t(self) {};
 
-gtk_window_t *Lib_gbw::gbw_api_window_t::top_level() {
+gtk_window_t *Gbw_base::gbw_api_window_t::top_level() {
   if (!self->top_level_window) {
     auto root_ptr = self->widget->get_root();
     auto window = dynamic_cast<gtk_window_t *>(root_ptr);
@@ -107,7 +108,7 @@ gtk_window_t *Lib_gbw::gbw_api_window_t::top_level() {
   return self->top_level_window;
 };
 
-gtk_window_t *Lib_gbw::gbw_api_window_t::browser() {
+gtk_window_t *Gbw_base::gbw_api_window_t::browser() {
   if (!self->browser_window) {
     self->browser_window = static_cast<gtk_window_t *>(self->engine);
   }
@@ -115,9 +116,9 @@ gtk_window_t *Lib_gbw::gbw_api_window_t::browser() {
 };
 
 /* #endregion */
-/* #region Lib_gbw::gbw::csd */
+/* #region Gbw_base::gbw::csd */
 
-bool Lib_gbw::gbw_api_csd_t::is_active() {
+bool Gbw_base::gbw_api_csd_t::is_active() {
   auto window = self->gbw.window.top_level();
   auto is_application = !!window->get_application();
   auto has_titlebar = !!window->get_titlebar();
@@ -138,11 +139,11 @@ bool Lib_gbw::gbw_api_csd_t::is_active() {
   return true;
 }
 
-Lib_gbw::gbw_api_csd_t::gbw_api_csd_t(Lib_gbw *self) : nested_api_t(self) {};
+Gbw_base::gbw_api_csd_t::gbw_api_csd_t(Gbw_base *self) : nested_api_t(self) {};
 
-position_t &Lib_gbw::gbw_api_csd_t::fudge() { return self->csd_fudge; }
+position_t &Gbw_base::gbw_api_csd_t::fudge() { return self->csd_fudge; }
 
-position_t Lib_gbw::gbw_api_csd_t::get_offset(layout_t native) {
+position_t Gbw_base::gbw_api_csd_t::get_offset(layout_t native) {
   auto gtk = self->gbw.window.top_level();
   if (gtk->is_maximized() || !gtk->is_active()) {
     return {0, 0};
@@ -160,17 +161,17 @@ position_t Lib_gbw::gbw_api_csd_t::get_offset(layout_t native) {
 }
 
 /* #endregion */
-/* #region Lib_gbw::gbw::signals */
+/* #region Gbw_base::gbw::signals */
 
-Lib_gbw::gbw_api_signals_t::gbw_api_signals_t(Lib_gbw *self)
+Gbw_base::gbw_api_signals_t::gbw_api_signals_t(Gbw_base *self)
     : nested_api_t(self) {}
 
-ready_signal_t Lib_gbw::gbw_api_signals_t::windows_are_ready() {
+ready_signal_t Gbw_base::gbw_api_signals_t::windows_are_ready() {
   return self->windows_are_ready_signal;
 }
 
 /* #endregion */
-void Lib_gbw::fudge(int x, int y) { Lib_gbw::csd_fudge = {x, y}; };
+void Gbw_base::fudge(int x, int y) { Gbw_base::csd_fudge = {x, y}; };
 
 // position_t Windows::win_api_window_t::csd_decorations_offset_imp(
 //     HWND &hWnd, gtk_window_t &window, position_t &fudge) {

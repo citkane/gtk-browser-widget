@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_OS_LIB_LIB_OS_HH
-#define GBW_OS_LIB_LIB_OS_HH
+#ifndef GBW_OS_OS_BASE_HH
+#define GBW_OS_OS_BASE_HH
 
-#include "browsers/lib/Lib_browser.hh"
+#include "browsers/Browser_base.hh"
 #include "types/types.hh"
 
 using namespace gbw::browsers;
 namespace gbw::os {
 
-class Lib_os : protected Lib_browser {
+class Os_base : protected Browser_base {
 
 public:
-  virtual ~Lib_os() = 0;
-  Lib_os() = default;
+  virtual ~Os_base() = 0;
+  Os_base() = default;
 
 protected:
   struct os_api_layout_t : nested_api_t<Os> {
@@ -73,8 +73,8 @@ protected:
     virtual native_window_t browser() = 0;
   };
 
-  struct os_api_signals_t : nested_api_t<Lib_os> {
-    os_api_signals_t(Lib_os *self);
+  struct os_api_signals_t : nested_api_t<Os_base> {
+    os_api_signals_t(Os_base *self);
 
     /// The signal for the Os native windows ready event.
     ready_signal_t &native_windows_ready();
@@ -103,9 +103,9 @@ private:
 
   ready_signal_t native_windows_ready_signal;
 
-  friend gbw::os::Os;
+  friend gbw::Os;
 };
 
 } // namespace gbw::os
 
-#endif // GBW_OS_LIB_LIB_OS_HH
+#endif // GBW_OS_OS_BASE_HH

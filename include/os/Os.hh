@@ -22,13 +22,11 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_OS_TYPES_INCLUDES_HH
-#define GBW_OS_TYPES_INCLUDES_HH
+#ifndef GBW_OS_OS_HH
+#define GBW_OS_OS_HH
 
 #ifdef _WIN32
+#include "os/windows/Windows.hh" // IWYU pragma: keep
+#endif                           // _WIN32
 
-#include "os/windows/types/types_winos.hh" // IWYU pragma: keep
-using namespace gbw::os::windows;
-
-#endif // _WIN32
-#endif // GBW_OS_TYPES_INCLUDES_HH
+#endif // GBW_OS_OS_HH

@@ -25,7 +25,7 @@
 #include "os/windows/Windows.hh"
 
 using namespace gbw;
-using namespace gbw::os::windows;
+using namespace gbw::os;
 
 Windows::~Windows() {}
 

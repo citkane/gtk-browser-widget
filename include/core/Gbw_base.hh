@@ -22,28 +22,28 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_CORE_LIB_LIB_GBW_HH
-#define GBW_CORE_LIB_LIB_GBW_HH
+#ifndef GBW_CORE_GBW_BASE_HH
+#define GBW_CORE_GBW_BASE_HH
 
-#include "os/lib/includes.hh"
+#include "os/Os.hh"
 #include "types/types.hh"
 
 namespace gbw {
 namespace core::lib {
 
-class Lib_gbw : protected Os {
+class Gbw_base : protected Os {
 
 public:
-  virtual ~Lib_gbw() = 0;
-  Lib_gbw(gbw_widget_t *widget, gbw_browser_t *engine);
+  virtual ~Gbw_base() = 0;
+  Gbw_base(gbw_widget_t *widget, gbw_browser_t *engine);
 
   /// Set the fudge offset to compensate for pixel perfect alignment
   /// @see gbw::options::gtk::csd::set_fudge
   static void fudge(int x, int y);
 
 private:
-  struct gbw_api_layout_t : nested_api_t<Lib_gbw> {
-    gbw_api_layout_t(Lib_gbw *self);
+  struct gbw_api_layout_t : nested_api_t<Gbw_base> {
+    gbw_api_layout_t(Gbw_base *self);
 
     /// Returns the relative layout of the browser widget to the top level
     /// Gtk::Window
@@ -63,8 +63,8 @@ private:
     void size_browser(layout_t &layout);
   };
 
-  struct gbw_api_window_t : nested_api_t<Lib_gbw> {
-    gbw_api_window_t(Lib_gbw *self);
+  struct gbw_api_window_t : nested_api_t<Gbw_base> {
+    gbw_api_window_t(Gbw_base *self);
 
     /// Gets the top level Gtk::Window
     gtk_window_t *top_level();
@@ -73,8 +73,8 @@ private:
     gtk_window_t *browser();
   };
 
-  struct gbw_api_csd_t : nested_api_t<Lib_gbw> {
-    gbw_api_csd_t(Lib_gbw *self);
+  struct gbw_api_csd_t : nested_api_t<Gbw_base> {
+    gbw_api_csd_t(Gbw_base *self);
 
     /// Determines if the given `Gtk::Window` is using gtk Client Side
     /// Decorations (CSD)
@@ -92,14 +92,14 @@ private:
     position_t get_offset(layout_t native);
   };
 
-  struct gbw_api_signals_t : nested_api_t<Lib_gbw> {
-    gbw_api_signals_t(Lib_gbw *self);
+  struct gbw_api_signals_t : nested_api_t<Gbw_base> {
+    gbw_api_signals_t(Gbw_base *self);
 
     ready_signal_t windows_are_ready();
   };
 
-  struct gbw_api_t : private nested_api_t<Lib_gbw> {
-    gbw_api_t(Lib_gbw *self);
+  struct gbw_api_t : private nested_api_t<Gbw_base> {
+    gbw_api_t(Gbw_base *self);
     /// Gtk::Window related operations
     gbw_api_window_t window;
     /// Gtk CSD (Client Side Decoration) related operations
@@ -128,7 +128,7 @@ private:
   ready_signal_t windows_are_ready_signal;
   bool windows_are_ready{};
 
-  friend class gbw::Browser_widget;
+  friend class gbw::Gbw_widget;
   friend struct gbw_api_t;
   friend struct gbw_api_window_t;
   friend struct gbw_api_csd_t;
@@ -162,11 +162,11 @@ struct gtk {
     /// This may be asymmetrical and different for any given theme, so the user
     /// may need to do some manual fine tuning (fudge) for their particular case
     /// to be pixel perfect.
-    static void set_fudge(int x, int y) { core::lib::Lib_gbw::fudge(x, y); }
+    static void set_fudge(int x, int y) { core::lib::Gbw_base::fudge(x, y); }
   };
 };
 
 } // namespace options
 } // namespace gbw
 
-#endif // GBW_CORE_LIB_LIB_GBW_HH
+#endif // GBW_CORE_GBW_BASE_HH

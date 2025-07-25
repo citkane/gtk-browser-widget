@@ -32,15 +32,20 @@
 #include <gtkmm/window.h>
 #include <optional>
 
-#include "browsers/types/includes.hh" // IWYU pragma: keep
-#include "os/types/includes.hh"       // IWYU pragma: keep
-#include "types/errors.hh"            // IWYU pragma: keep
+#include "browsers/types.hh" // IWYU pragma: keep
+#include "os/types.hh"       // IWYU pragma: keep
+#include "types/errors.hh"   // IWYU pragma: keep
+
+using namespace gbw::types;
+using namespace gbw::browsers::types;
+using namespace gbw::os::types;
 
 namespace gbw {
-class Browser_widget;
+
+class Gbw_widget;
 
 namespace core {
-class Browser_window;
+class Gbw_window;
 
 } // namespace core
 
@@ -79,8 +84,8 @@ using gdk_position_t = std::optional<Gdk::Graphene::Point>;
 using gtk_window_t = Gtk::Window;
 using gtk_widget_t = Gtk::Widget;
 
-using gbw_browser_t = gbw::core::Browser_window;
-using gbw_widget_t = gbw::Browser_widget;
+using gbw_browser_t = gbw::core::Gbw_window;
+using gbw_widget_t = gbw::Gbw_widget;
 
 using ready_signal_t = sigc::signal<void()>;
 
@@ -89,8 +94,6 @@ using smart_control_t = smart_ptr<browser_controller_t>;
 using smart_core_t = smart_ptr<browser_core_t>;
 
 } // namespace types
-
-using namespace types;
 
 } // namespace gbw
 

@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_BROWSERS_TYPES_INCLUDES_HH
-#define GBW_BROWSERS_TYPES_INCLUDES_HH
+#ifndef GBW_BROWSERS_TYPES_HH
+#define GBW_BROWSERS_TYPES_HH
 
 #ifdef GBW_MSWEBVIEW2
-#include "browsers/mswebview2/types/types_wv2.hh" // IWYU pragma: keep
-using namespace gbw::browsers::mswebview2;
-#endif // GBW_MSWEBVIEW2
+#include "browsers/mswebview2/types.hh" // IWYU pragma: keep
+#endif                                  // GBW_MSWEBVIEW2
 
-#endif // GBW_BROWSERS_TYPES_INCLUDES_HH
+#endif // GBW_BROWSERS_TYPES_HH

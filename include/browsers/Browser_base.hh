@@ -22,27 +22,27 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_BROWSERS_LIB_LIB_BROWSER_HH
-#define GBW_BROWSERS_LIB_LIB_BROWSER_HH
+#ifndef GBW_BROWSERS_BROWSER_BASE_HH
+#define GBW_BROWSERS_BROWSER_BASE_HH
 
 #include "types/types.hh"
 
 namespace gbw::browsers {
 
-class Lib_browser {
+class Browser_base {
 public:
-  virtual ~Lib_browser() = 0;
-  Lib_browser() {}
+  virtual ~Browser_base() = 0;
+  Browser_base() {}
 
 protected:
-  struct browser_api_layout_t : nested_api_t<Browser_engine> {
-    browser_api_layout_t(Browser_engine *self);
+  struct browser_api_layout_t : nested_api_t<Browser> {
+    browser_api_layout_t(Browser *self);
 
     virtual void fit(layout_t &layout) = 0;
   };
 
-  struct browser_api_signals_t : nested_api_t<Lib_browser> {
-    browser_api_signals_t(Lib_browser *self);
+  struct browser_api_signals_t : nested_api_t<Browser_base> {
+    browser_api_signals_t(Browser_base *self);
 
     /// The signal for the browser window ready event.
     ready_signal_t &core_ready();
@@ -54,8 +54,8 @@ protected:
     ready_signal_t &controller_ready();
   };
 
-  struct browser_api_api_t : nested_api_t<Lib_browser> {
-    browser_api_api_t(Lib_browser *self);
+  struct browser_api_api_t : nested_api_t<Browser_base> {
+    browser_api_api_t(Browser_base *self);
 
     /// Gets the browser core API (ie. the window instance DOM/JS API)
     smart_core_t &core();
@@ -69,8 +69,8 @@ protected:
     bool ready();
   };
 
-  struct browser_api_t : nested_api_t<Browser_engine> {
-    browser_api_t(Browser_engine *self);
+  struct browser_api_t : nested_api_t<Browser> {
+    browser_api_t(Browser *self);
 
     /// Initialises the browser engine and waits for completion signals.
     virtual void init() = 0;
@@ -100,13 +100,13 @@ private:
 
   bool api_is_ready{};
 
-  friend gbw::Browser_engine;
+  friend gbw::Browser;
   friend struct browser_api_signals_t;
-  friend class gbw::browsers::mswebview2::Ms_Webview2;
+  friend class gbw::browsers::Mswebview2;
 };
 
-inline Lib_browser::~Lib_browser() {}
+inline Browser_base::~Browser_base() {}
 
 } // namespace gbw::browsers
 
-#endif // GBW_BROWSERS_LIB_LIB_BROWSER_HH
+#endif // GBW_BROWSERS_BROWSER_BASE_HH

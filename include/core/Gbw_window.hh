@@ -22,22 +22,22 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_CORE_BROWSER_WINDOW_HH
-#define GBW_CORE_BROWSER_WINDOW_HH
+#ifndef GBW_CORE_GBW_WINDOW_HH
+#define GBW_CORE_GBW_WINDOW_HH
 
-#include "core/Browser_engine.hh" // IWYU pragma: keep
+#include "browsers/Browser.hh" // IWYU pragma: keep
 #include "types/types.hh"
 
 namespace gbw {
 
-class Browser_widget;
+class Gbw_widget;
 
 namespace core {
 
-class Browser_window : public gtk_window_t, public Browser_engine {
+class Gbw_window : public gtk_window_t, public Browser {
 public:
-  ~Browser_window() override;
-  Browser_window(gbw_widget_t *widget);
+  ~Gbw_window() override;
+  Gbw_window(gbw_widget_t *widget);
 
 private:
   bool focus_initialised;
@@ -52,15 +52,15 @@ private:
   /// AND shown, so we correctly catch the application bootstrap sequence
   void window_ready_cb();
 
-  /// Sets the initial GTK properties for the @ref Browser_window
+  /// Sets the initial GTK properties for the @ref Gbw_window
   void browser_window_init_config();
 
   /// Sets a controller to maintain visual focus on the app window instead of
   /// the native browser window when the input switches.
   void set_focus_controller();
 
-  /// Determines UI position and size changes on the @ref gbw::Browser_widget
-  /// instance and applies them to the @ref gbw::gtk::Browser_window instance
+  /// Determines UI position and size changes on the @ref gbw::Gbw_widget
+  /// instance and applies them to the @ref gbw::gtk::Gbw_window instance
   /// and it's contained browser display.
   ///
   /// @note Since GTK 4 we can no longer embed a `Gtk::Window` as a child of
@@ -70,11 +70,11 @@ private:
   /// For this purpose, We hook into the GTK event loop with `Glib::signal_idle`
   void layout_update(layout_t &new_layout);
 
-  friend class gbw::Browser_widget;
+  friend class gbw::Gbw_widget;
 };
 
 } // namespace core
 
 } // namespace gbw
 
-#endif // GBW_CORE_BROWSER_WINDOW_HH
+#endif // GBW_CORE_GBW_WINDOW_HH

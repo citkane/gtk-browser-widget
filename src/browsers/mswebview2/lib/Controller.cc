@@ -23,9 +23,9 @@
  */
 
 #include "browsers/mswebview2/lib/Controller.hh"
-#include "browsers/mswebview2/Ms_Webview2.hh"
+#include "browsers/mswebview2/Mswebview2.hh"
 
-using namespace gbw::browsers::mswebview2::lib_mswebview2;
+using namespace gbw::browsers::mswebview2;
 
 HRESULT STDMETHODCALLTYPE Controller::CompletedHandler::Invoke(
     HRESULT result, browser_controller_t *controller) {

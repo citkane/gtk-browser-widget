@@ -22,18 +22,51 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_OS_LIB_INCLUDES_HH
-#define GBW_OS_LIB_INCLUDES_HH
+#ifndef GBW_GBW_WIDGET_HH
+#define GBW_GBW_WIDGET_HH
 
-#ifdef _WIN32
-#include "os/windows/Windows.hh" // IWYU pragma: keep
+#include "core/Gbw_window.hh"
+#include "types/types.hh"
 
-namespace gbw::os {
-using Os = windows::Windows;
-}
+using namespace gbw::types;
 
-using namespace gbw::os::windows;
-#endif // _WIN32
+using namespace gbw::core;
+namespace gbw {
+class Gbw_widget : public gtk_widget_t {
+public:
+  ~Gbw_widget() override {
+    std::cout << "Destroying Gbw_widget" << std::endl;
+    engine.close();
+    std::cout << "Destroyed Gbw_widget" << std::endl;
+  }
 
-using namespace gbw::os;
-#endif // GBW_OS_LIB_INCLUDES_HH
+  Gbw_widget() : engine(this) {
+    Gtk::manage(this);
+    init_widget_layout();
+  };
+
+  ready_signal_t &ready() { return engine.browser.signals.core_ready(); }
+
+  auto &api_core() { return engine.browser.api.core(); }
+
+  auto &api_controller() { return engine.browser.api.controller(); }
+
+  auto &api_env() { return engine.browser.api.environment(); }
+
+private:
+  Gbw_window engine;
+
+  void init_widget_layout() {
+    set_hexpand(true);
+    set_vexpand(true);
+    set_halign(Gtk::Align::FILL);
+    set_valign(Gtk::Align::FILL);
+    set_margin_top(0);
+    set_margin_bottom(0);
+    set_margin_start(0);
+    set_margin_end(0);
+  }
+};
+
+} // namespace gbw
+#endif // GBW_GBW_WIDGET_HH

@@ -22,9 +22,30 @@
  * SOFTWARE.
  */
 
-#ifndef GBW_CORE_BROWSER_ENGINE_HH
-#define GBW_CORE_BROWSER_ENGINE_HH
+#ifndef GBW_BROWSERS_MSWEBVIEW2_TYPES_HH
+#define GBW_BROWSERS_MSWEBVIEW2_TYPES_HH
+#if defined(_WIN32) && defined(GBW_MSWEBVIEW2)
 
-#include "browsers/lib/includes.hh" // IWYU pragma: keep
+#include "browsers/mswebview2/lib/mingw32_compat.hh" // IWYU pragma: keep
+#include <WebView2.h>
 
-#endif // GBW_CORE_BROWSER_ENGINE_HH
+#define create_webview2 CreateCoreWebView2EnvironmentWithOptions
+
+namespace gbw {
+namespace browsers {
+class Mswebview2;
+
+namespace types {
+
+using browser_env_t = ICoreWebView2Environment;
+using browser_controller_t = ICoreWebView2Controller;
+using browser_core_t = ICoreWebView2;
+
+} // namespace types
+} // namespace browsers
+using Browser = gbw::browsers::Mswebview2;
+
+} // namespace gbw
+
+#endif // defined(_WIN32) && defined(GBW_MSWEBVIEW2)
+#endif // GBW_BROWSERS_MSWEBVIEW2_TYPES_HH
