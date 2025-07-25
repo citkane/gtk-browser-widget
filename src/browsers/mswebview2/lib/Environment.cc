@@ -22,17 +22,18 @@
  * SOFTWARE.
  */
 
-#include "browsers/mswebview2/lib/Environment.hh"
-#include "browsers/mswebview2/Ms_Webview2.hh"
+#include "browsers/mswebview2/Mswebview2.hh" //include first
 
-using namespace gbw::browsers::mswebview2::lib_mswebview2;
+#include "browsers/mswebview2/lib/Environment.hh"
+
+using namespace gbw::browsers::mswebview2;
 
 HRESULT STDMETHODCALLTYPE
 Environment::CompletedHandler::Invoke(HRESULT result, browser_env_t *env) {
   if (!env) {
-    throw ebw_error("Failed to invoke MsWebview2 environment");
+    throw gbw_error("Failed to invoke MsWebview2 environment");
   }
 
-  webview->set_browser_env(*env);
+  webview->set_api_environment(*env); // set_browser_env(*env);
   return S_OK;
 }

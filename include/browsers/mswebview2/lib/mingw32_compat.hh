@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH
-#define EBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH
-#if defined(__MINGW32__) && defined(EBW_MSWEBVIEW2)
+#ifndef GBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH
+#define GBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH
+#if defined(__MINGW32__) && defined(GBW_MSWEBVIEW2)
 
 #include <WebView2.h>
 #include <_mingw.h>
@@ -38,5 +38,5 @@ __CRT_UUID_DECL(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler,
                 0xC0, 0xEB)
 // Add similar lines for any other interfaces you use
 
-#endif // defined(__MINGW32__) && defined(EBW_MSWEBVIEW2)
-#endif // EBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH
+#endif // defined(__MINGW32__) && defined(GBW_MSWEBVIEW2)
+#endif // GBW_BROWSERS_MSWEBVIEW2_LIB_MING32_COMPAT_HH

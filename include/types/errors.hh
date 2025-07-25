@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-#ifndef EBW_TYPES_ERRORS_HH
-#define EBW_TYPES_ERRORS_HH
+#ifndef GBW_TYPES_ERRORS_HH
+#define GBW_TYPES_ERRORS_HH
 
 #include <iostream>
 #include <stdexcept>
 
 namespace gbw::types {
-using ebw_error = std::runtime_error;
+using gbw_error = std::runtime_error;
 }
 
-#endif // EBW_TYPES_ERRORS_HH
+#endif // GBW_TYPES_ERRORS_HH
