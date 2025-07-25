@@ -65,7 +65,7 @@ cd gtk-browser-widget
 
 # Use the installer script 
 source installer.sh
-set_browser mswebview2 # default is Chromium
+select_browser mswebview2 # default is Chromium
 packages_install
 set_target examples/mswebview2/main.cc
 generate
