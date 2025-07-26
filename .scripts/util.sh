@@ -8,7 +8,6 @@ BROWSER_INCLUDE_DIR=""
 BROWSER_LIB_DIR=""
 NUGET=$PACKAGES_DIR/bin/nuget.exe
 
-
 set_build_type() {
     for arg in "$@"; do
         if [[ "$arg" == "Debug" || "$arg" == "Release" || "$arg" == "RelWithDebInfo" ]]; then
@@ -97,7 +96,6 @@ For download and installation, see: https://www.msys2.org"
 
     return 0;
 }
-
 
 resolve_path() {
   echo "$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")"

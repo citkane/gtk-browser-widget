@@ -88,7 +88,6 @@ packages_install() {
     fi
 }
 
-
 SET_TARGET_HELP="\
 #  Sets the path to the compilation target
 ## Usage:

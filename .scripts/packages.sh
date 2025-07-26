@@ -11,8 +11,6 @@ WEBKIT_BACKEND_V=1.16.0
 WEBKIT_LIB_V=1.16.2
 WEBKIT_TARGET_DIR="$PACKAGES_DIR/webkit"
 
-
-
 install_cef() {
     verify_nuget
     $NUGET install chromiumembeddedframework.runtime -Version $CHROMIUM_NUGET_V -OutputDirectory "$PACKAGES_DIR"
@@ -61,8 +59,6 @@ install_webkit() {
     ninja -C "$wpe_src_dir/build" install
 
 }
-
-
 
 # params:
 # $1 - wpe_src_dir
