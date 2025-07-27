@@ -3,6 +3,10 @@
 # shellcheck disable=SC2034
 # shellcheck disable=SC2120
 
+## Note:
+## Bash ≥ 4.0 required
+## We should implement a check, especially for older Macs < 2019
+
 BUILD_TYPE=Debug
 BUILD_GENERATOR="Ninja Multi-Config"
 PROJECT_NAME=gbw
@@ -15,63 +19,40 @@ PACKAGES_DIR=$(pwd)/.packages
 BROWSER_OPTIONS="<chromium|webkit|mswebview2>"
 BROWSER_DEFAULT="chromium"
 
-SYS_OPTS=""
-
-PATH=$(cygpath -w /ucrt64/bin):$PATH
-export PATH
+WIN_COMPILER_DEFAULT="UCRT"
 
 source ./.scripts/util.sh
 source ./.scripts/packages.sh
-
-# Check if we are running in a MSYS2 UCRT environment for Windows
-if ! check_win_env; then
-    return 1;
-fi
+source ./.scripts/init.sh
 
 SELECT_BROWSER_HELP="\
-#  Selects the browser engine to use
-## Options:
-#      chromium                                Use Chromium Embedded Framework (CEF)
-#      webkit                                                             Use Webkit
-#      mswebview2                                     Use MS WebView2 (Windows only)
-## Default:
-#      chromium
-## Usage:
-#      select_browser $BROWSER_OPTIONS"
+Opens a dialogue to select the browser engine
+
+Options:
+    chromium                                Use Chromium Embedded Framework (CEF)
+    webkit                                                             Use Webkit
+    mswebview2                                     Use MS WebView2 (Windows only)
+Default:
+    $BROWSER_DEFAULT
+Usage:
+    select_browser"
 select_browser() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$SELECT_BROWSER_HELP"
         return 0
     fi
 
-    if [ -z "$1" ]; then 
-        BROWSER=$BROWSER_DEFAULT
-        echo "Using the default browser '$BROWSER'"
-        return 0
-    fi
-
-    if [ "$1" = "mswebview2" ]; then
-        BROWSER="$1"
-    elif [ "$1" = "chromium" ]; then
-        BROWSER="$1"
-    elif [ "$1" = "webkit" ]; then
-        BROWSER="$1"
-    else
-        echo "'$1' was not a valid browser option: $BROWSER_OPTIONS"
-        select_browser
-        return 0
-    fi
-
-    echo "'$BROWSER' browser selected"
+    prompt_browser
 }
 
 PACKAGE_INSTALL_HELP="\
-#  Installs required browser library packages.
-#  ALPHA stage: MsWebview2 on Windows OS is functional.
-## Usage:
-#   packages_install"
+Installs required browser library packages.
+ALPHA stage: MsWebview2 on Windows OS is functional.
+
+Usage:
+ packages_install"
 packages_install() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$PACKAGE_INSTALL_HELP"
         return 0
     fi
@@ -89,29 +70,42 @@ packages_install() {
 }
 
 SET_TARGET_HELP="\
-#  Sets the path to the compilation target
-## Usage:
-#      set_target <rel/path/to/main.cc>                                   (required)"
+Opens a dialogue to sets the path to the compilation target
+
+Options:
+    <path>  # The relative path to the compilation target (required)
+Default:
+    examples/$BROWSER_OPTIONS/main.cc
+Usage:
+    set_target"
 set_target(){
-    set_target_file "$1"
+    if "$(is_help "$@")"; then
+        print_help "$SET_TARGET_HELP"
+        return 0
+    fi
+        
+    if [ -z "$BROWSER" ]; then 
+        select_browser
+    fi    
+    prompt_build_target
 }
 
 GENERATE_HELP="\
-#  Generates a clean build definition
-## Usage:
-#      generate"
+Generates a clean build definition
+
+Usage:
+    generate"
 generate() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$GENERATE_HELP"
-        [[ $PS1 ]] && return 0 || exit 0
-    fi
-    if ! is_target_file_set; then 
-        return 1 
+        return 0
     fi
     if [ -z "$BROWSER" ]; then 
         select_browser
     fi
-
+    if [ -z "$BUILD_TARGET" ]; then 
+        set_target 
+    fi
     rm -rf "$BUILD_DIR"
     set_sys_opts
 
@@ -126,18 +120,22 @@ generate() {
 }
 
 BUILD_HELP="\
-#  Builds the target binary
-## Options:
-#      --clean                Generate a clean definition before building (optional)
-#      <Debug|Release|RelWithDebInfo>                     The build type. (optional)
-## Default:
-#      Debug
-## Usage:
-#      build <Debug|Release|RelWithDebInfo> --clean"
+Builds the target binary
+
+Options:
+    --clean                         # Generate a clean definition before building (optional)
+    <Debug|Release|RelWithDebInfo>  # The build type (optional)
+Default:
+    Debug
+Usage:
+    build
+    build --clean
+    build <Debug|Release|RelWithDebInfo>
+    build <Debug|Release|RelWithDebInfo> --clean"
 build() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$BUILD_HELP"
-        [[ $PS1 ]] && return 0 || exit 0
+        return 0
     fi
 
     rm -rf "$INSTALL_DIR"
@@ -150,17 +148,19 @@ build() {
 }
 
 INSTALL_HELP="\
-#  Installs the built binary and required libs
-## Options:
-#      <path/to/install/dir>                       The installation path. (optional) 
-## Default:
-#      <project_root>/.dist
-## Usage:
-#      install <path/to/install/dir>"
+Installs the built binary and required libs
+
+Options:
+    <dir>   # The installation directory. (optional) 
+Default:
+    <project_root>/.dist
+Usage:
+    install
+    install <dir>"
 install() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$INSTALL_HELP"
-        [[ $PS1 ]] && return 0 || exit 0
+        return 0
     fi
 
     set_install_dir "$1"
@@ -171,97 +171,88 @@ install() {
 }
 
 RUN_HELP="\
-#  Runs the installed binary
-## Options:
-#      <path/to/install/dir>                       The installation path. (optional)
-## Default:
-#      <project_root>/.dist
-## Usage:
-#      run <path/to/install/dir>"
+Runs the installed binary
+
+Options:
+    <dir>   # The installation directory (optional) 
+Default:
+    <project_root>/.dist
+Usage:
+    run
+    run <dir>"
 run() {
-    if [ "$(is_help "$@")" = true ]; then
+    if "$(is_help "$@")"; then
         print_help "$RUN_HELP"
-        [[ $PS1 ]] && return 0 || exit 0
+        return 0
     fi
 
     set_install_dir "$1"
-    local executable=$INSTALL_DIR/bin/$PROJECT_NAME.exe
+    local executable=$INSTALL_DIR/bin/$PROJECT_NAME$(exe_ext)
+
     if [ ! -f "$executable" ]; then
         install "$@"
     fi
+
     $executable
 }
 
-HELP=$(
+print_gbw_header() {
     cat <<EOF
 ####################################################################################
 #           Welcome to the Gtk Browser Widget installer script!                    #
 ####################################################################################
 
+EOF
+}
+
+help() {
+    cat <<EOF
 Basic usage:
 ------------------------------------------------------------------------------------
 $ source installer.sh   # Creates the installer session environment       (required)
 
 $ --help                # Prints help (this)
-$ select_browser        # Select browser engine
-$ packages_install      # Installs required packages
-$ set_target            # Set compilation target file
+$ select_browser        # Select a browser engine
+$ packages_install      # Install the required packages
+$ set_target            # Set the compilation target file
 $ generate              # Generate a clean build definition
-$ build                 # Builds the binary
-$ install               # Installs the built binary
-$ run                   # Runs the installed binary
+$ build                 # Build the executable binary
+$ install               # Install the built binary
+$ run                   # Run the installed binary
 
-$ <command> <-h --help> # Prints help for the command
+$ <command> <-h|--help> # Prints detailed help for the command
 
-Advanced usage:
-------------------------------------------------------------------------------------
-## select_browser: ##
-$SELECT_BROWSER_HELP
-####################################################################################
-
-## set_target: ##
-$SET_TARGET_HELP
-####################################################################################
-
-## packages_install: ##
-$PACKAGE_INSTALL_HELP
-####################################################################################
-
-## generate: ##
-$GENERATE_HELP
-####################################################################################
-
-## build: ##
-$BUILD_HELP
-####################################################################################
-
-## install: ##
-$INSTALL_HELP
-####################################################################################
-
-## run: ##
-$RUN_HELP
-####################################################################################
 EOF
-)
-
-help() {
-    echo "$HELP"
 }
 
-help
 
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+
+print_gbw_sourced() {
     cat <<EOF
-
 ####################################################################################
 #               The install script has been sourced.                               #
-#               Run the commands directly from your terminal                       #
+#               Run instructions directly from your terminal                       #
 ####################################################################################
 
 EOF
-fi
+}
 
-if [ "$(is_help "$@")" = true ]; then
+is_interactive() {
+    if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if is_interactive; then
+    print_gbw_header
+    if [ ! "$(source ./.scripts/os.sh)" ]; then
+        return 1
+    fi
+    init_prompts
+    print_gbw_sourced
+    help
+else
     help
 fi

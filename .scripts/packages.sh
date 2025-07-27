@@ -1,5 +1,9 @@
 #!/bin/bash
 
+BROWSER=""
+BROWSER_INCLUDE_DIR=""
+BROWSER_LIB_DIR=""
+
 NUGET=$PACKAGES_DIR/bin/nuget.exe
 PACKAGES_DOWNLOAD_DIR="$PACKAGES_DIR/.downloads"
 
@@ -10,6 +14,24 @@ WEBKIT_WPE_V=2.48.3
 WEBKIT_BACKEND_V=1.16.0
 WEBKIT_LIB_V=1.16.2
 WEBKIT_TARGET_DIR="$PACKAGES_DIR/webkit"
+
+SYS_OPTS=""
+
+set_sys_opts() {
+    if [ "$BROWSER" = "chromium" ]; then
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGES_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include \
+        -DBROWSER_LIB_DIR=$PACKAGES_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64"
+    elif [ "$BROWSER" = "mswebview2" ]; then
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGES_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/include \
+        -DBROWSER_LIB_DIR=$PACKAGES_DIR/Microsoft.Web.WebView2.$MSWEBVIEW_NUGET_V/build/native/x64"
+    elif [ "$BROWSER" = "webkit" ]; then
+        SYS_OPTS="\
+        -DBROWSER_INCLUDE_DIR=$PACKAGES_DIR/webkit-$WEBKIT_WPE_V/include \
+        -DBROWSER_LIB_DIR=$PACKAGES_DIR/webkit-$WEBKIT_WPE_V/lib"
+    fi
+}
 
 install_cef() {
     verify_nuget
