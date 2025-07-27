@@ -1,26 +1,19 @@
 set(BROWSERS MSWEBVIEW2 WEBKIT CHROMIUM)
 
 ## Defines the embedded browser to use. One of [MSWEBVIEW2, WEBKIT, CHROMIUM] is allowed.
-##
-## If none is given, the default OS embedded browser will be defined:
-## - Windows: MSWEBVIEW2
-## - Linux: WEBKIT
-## - Mac: WEBKIT
+## Based on value of $BROWSER.
+
 function (set_browser_definition)
-    if(BROWSER=="mswebview2" AND NOT WIN32)
-            message(FATAL_ERROR "MSWEBVIEW2 is only available on the Windows operating system")
+    if("${BROWSER}" STREQUAL "chromium")
+        target_compile_definitions(${PROJECT_NAME} PRIVATE GBW_CHROMIUM=ON)
+    elseif("${BROWSER}" STREQUAL "mswebview2")
+        if(NOT WIN32)
+            message(FATAL_ERROR "MSWEBVIEW2 is only available on the Windows operating system.")
         endif()
-    # Compile the embedded browser type definition
-    if(BROWSER=="mswebview2")
         target_compile_definitions(${PROJECT_NAME} PRIVATE GBW_MSWEBVIEW2=ON)
-    endif()
-    if(BROWSER=="webkit")
+    elseif("${BROWSER}" STREQUAL "webkit")
         target_compile_definitions(${PROJECT_NAME} PRIVATE GBW_WEBKIT=ON)
     endif()
-    if(BROWSER=="chromium")
-        target_compile_definitions(${PROJECT_NAME} PRIVATE GBW_CHROMIUM=ON)
-    endif()
-    # Set the default embedded browser if none has been defined
 endfunction()
 
 function (set_browser_linked_lib)
