@@ -4,7 +4,13 @@
 set_build_type() {
     for arg in "$@"; do
         if [[ "$arg" == "Debug" || "$arg" == "Release" || "$arg" == "RelWithDebInfo" ]]; then
-            BUILD_TYPE=$arg
+            local build_type=$arg
+            if [ "$build_type" != "$BUILD_TYPE"];then
+                echo "Changed build type from '$BUILD_TYPE' to '$build_type'"
+                BUILD_TYPE="$build_type"
+            else
+                echo "Using build type '$BUILD_TYPE'"
+            fi
         fi
     done
 }
@@ -17,7 +23,10 @@ default_target() {
 
 set_install_dir() {
     if [[ -n "$1" ]]; then
-        INSTALL_DIR=$1
+        local install_dir=$(resolve_path "$1")
+        mkdir -p "$install_dir"
+        echo -e "The install directory was set:\n from: $INSTALL_DIR\n to: $install_dir\n"
+        INSTALL_DIR=$install_dir
     fi
 }
 
@@ -83,4 +92,26 @@ $1
 EOF
     )
     echo "$message"
+}
+
+is_chromium() {
+    if [ "$BROWSER" = "chromium" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+is_webkit() {
+    if [ "$BROWSER" = "webkit" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+is_mswebview2() {
+    if [ "$BROWSER" = "mswebview2" ]; then
+        return 0
+    else
+        return 1
+    fi
 }

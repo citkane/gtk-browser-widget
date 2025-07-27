@@ -32,6 +32,28 @@ get_os() {
     esac
 }
 
+is_windows() {
+    if [ "$OS" = "windows" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+is_linux() {
+    if [ "$OS" = "linux" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+is_darwin() {
+    if [ "$OS" = "darwin" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 ## Returns the Linux distribution flavour
 get_linux_distro() {
     local linux_flavour
@@ -70,43 +92,34 @@ get_linux_distro() {
     echo -e "Installing on a $LINUX_FLAVOUR $OS operating system\n" 
 }
 
+
+is_ucrt64() {
+    if [ "$MSYSTEM" = "UCRT64" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 exe_ext(){
-    if [ "$OS" = "windows" ]; then
+    if is_windows; then
         echo ".exe"
     else
         echo ""
     fi
 }
 
-check_win_env() {
-    case "$(uname | tr '[:upper:]' '[:lower:]')" in
-    msys* | cygwin* | mingw*)
-
-        if [ "$MSYSTEM" != "UCRT64" ]; then
-            print_error "\
-On Windows, you must use the MSYS2 UCRT64 terminal environment for this script.\n\
-For download and installation, see: https://www.msys2.org"
-            return 1
-        fi
-        ;;
-    esac
-
-    return 0;
-}
 
 if ! get_os; then
     return 1;
 fi
-
-if [ "$OS" = "linux" ]; then
-    if ! get_linux_distro; then
-        return 1
-    fi
+if is_linux && ! get_linux_distro; then
+    return 1
 fi
-
-
-# Check if we are running in a MSYS2 UCRT environment for Windows
-if [[ "$OS" = "windows" && ! check_win_env ]]; then
+if is_windows && ! is_ucrt64; then
+    print_error "\
+On Windows, you must use the MSYS2 UCRT64 terminal environment for this script.\n\
+For download and installation, see: https://www.msys2.org"
     return 1;
 fi
 
