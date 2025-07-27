@@ -37,7 +37,7 @@ Default:
 Usage:
     select_browser"
 select_browser() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$SELECT_BROWSER_HELP"
         return 0
     fi
@@ -52,7 +52,7 @@ ALPHA stage: MsWebview2 on Windows OS is functional.
 Usage:
  packages_install"
 packages_install() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$PACKAGE_INSTALL_HELP"
         return 0
     fi
@@ -79,7 +79,7 @@ Default:
 Usage:
     set_target"
 set_target(){
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$SET_TARGET_HELP"
         return 0
     fi
@@ -96,7 +96,7 @@ Generates a clean build definition
 Usage:
     generate"
 generate() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$GENERATE_HELP"
         return 0
     fi
@@ -133,14 +133,14 @@ Usage:
     build <Debug|Release|RelWithDebInfo>
     build <Debug|Release|RelWithDebInfo> --clean"
 build() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$BUILD_HELP"
         return 0
     fi
 
     rm -rf "$INSTALL_DIR"
 
-    if [ "$(is_build_clean "$@")" = true ] || [ "$(is_generated)" = false ]; then
+    if is_build_clean "$@"  ||  ! is_generated; then
         generate "$@"
     fi
     set_build_type "$@"
@@ -158,7 +158,7 @@ Usage:
     install
     install <dir>"
 install() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$INSTALL_HELP"
         return 0
     fi
@@ -181,7 +181,7 @@ Usage:
     run
     run <dir>"
 run() {
-    if "$(is_help "$@")"; then
+    if is_help "$@"; then
         print_help "$RUN_HELP"
         return 0
     fi

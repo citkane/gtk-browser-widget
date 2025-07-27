@@ -28,19 +28,27 @@ is_build_clean() {
             clean=true
         fi
     done
-    echo $clean
+    if [ $clean = true ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 is_generated() {
     if [ -f "$BUILD_DIR/CMakeCache.txt" ]; then
-        echo true
+        return 0
     else
-        echo false
+        return 1
     fi
 }
 
 resolve_path() {
-  echo "$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")"
+  if cd -- "$(dirname -- "$1")" 2>/dev/null; then
+    echo "$(pwd)/$(basename -- "$1")"
+  else
+    return 1
+  fi
 }
 
 
