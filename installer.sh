@@ -247,7 +247,7 @@ is_interactive() {
 
 if is_interactive; then
     print_gbw_header
-    if [ ! "$(source ./.scripts/os.sh)" ]; then
+    if ! source ./.scripts/os.sh; then
         return 1
     fi
     init_prompts

@@ -104,7 +104,10 @@ if [ "$OS" = "linux" ]; then
     fi
 fi
 
+
 # Check if we are running in a MSYS2 UCRT environment for Windows
-if [[ "$OS" = "windows" && ! $(check_win_env) ]]; then
+if [[ "$OS" = "windows" && ! check_win_env ]]; then
     return 1;
 fi
+
+return 0;
