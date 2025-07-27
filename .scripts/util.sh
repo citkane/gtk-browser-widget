@@ -75,8 +75,8 @@ select_browser_caller() {
     if [[ "$BROWSER" = "chromium" ]]; then
         BROWSER="chromium"
         SYS_OPTS="\
-        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/include\
-        -DBROWSER_LIB_DIR=$PACKAGE_DIR/chromiumembeddedframework.runtime.$CHROMIUM_NUGET_V/build/native/x64\
+        -DBROWSER_INCLUDE_DIR=$PACKAGE_DIR/cef.sdk.$CHROMIUM_NUGET_V/CEF/include\
+        -DBROWSER_LIB_DIR=$PACKAGE_DIR/cef.sdk.$CHROMIUM_NUGET_V/CEF/x64/release/VS2022\
         -DBROWSER=$BROWSER"
     elif [[ "$BROWSER" = "mswebview2" ]]; then
         BROWSER="mswebview2"
@@ -103,7 +103,7 @@ verify_nuget() {
 
 }
 install_cef() {
-    $NUGET install chromiumembeddedframework.runtime -Version $CHROMIUM_NUGET_V -OutputDirectory "$PACKAGE_DIR"
+    $NUGET install cef.sdk -Version $CHROMIUM_NUGET_V -OutputDirectory "$PACKAGE_DIR"
     echo "CEF installed successfully"
 }
 
