@@ -38,6 +38,7 @@ BUILD_TYPE=Debug
 BUILD_GENERATOR="Ninja Multi-Config"
 PROJECT_NAME=gbw
 
+ROOT_DIR=$(pwd)
 BUILD_DIR=$(pwd)/.build
 BUILD_TARGET=""
 INSTALL_DIR=$(pwd)/.dist
@@ -51,6 +52,7 @@ WIN_COMPILER_DEFAULT="UCRT"
 source ./.scripts/util.sh
 source ./.scripts/packages.sh
 source ./.scripts/init.sh
+source ./.scripts/env.sh
 
 SELECT_BROWSER_HELP="\
 Opens a dialogue to select the browser engine

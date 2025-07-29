@@ -77,6 +77,8 @@ select_browser_imp() {
     echo -e "'$BROWSER' browser selected\n"
 }
 
+#params:
+# $1 The build target file
 set_target_imp(){
     local target_file
     local resolved_target_file
@@ -86,7 +88,7 @@ set_target_imp(){
     else
         target_file="$1"        
     fi
-    resolved_target_file=$(resolve_path "$1")
+    resolved_target_file=$(resolve_rel_path "$1")
     
     if [ ! -e "$resolved_target_file" ]; then
         print_error "Target file '$target_file' not found"

@@ -49,7 +49,7 @@ default_target() {
 
 set_install_dir() {
     if [[ -n "$1" ]]; then
-        local install_dir=$(resolve_path "$1")
+        local install_dir=$(resolve_rel_path "$1")
         mkdir -p "$install_dir"
         echo -e "The install directory was set:\n from: $INSTALL_DIR\n to: $install_dir\n"
         INSTALL_DIR=$install_dir
@@ -78,12 +78,29 @@ is_generated() {
     fi
 }
 
-resolve_path() {
+#params:
+# $1 The relative path
+resolve_rel_path() {
   if cd -- "$(dirname -- "$1")" 2>/dev/null; then
     echo "$(pwd)/$(basename -- "$1")"
   else
+    print_error "Could not resolve path \"$1\""
     return 1
   fi
+}
+
+#params:
+# $1 The absolute Windows style path
+win_to_unixpath(){
+    unixpath="${1//\\//}"
+
+    if [[ "$unixpath" =~ ^([A-Za-z]):(.*)$ ]]; then
+        drive=${BASH_REMATCH[1],,}
+        path_rest=${BASH_REMATCH[2]}
+        unixpath="/$drive$path_rest"
+    fi
+
+    echo "$unixpath"
 }
 
 
@@ -141,3 +158,4 @@ is_mswebview2() {
         return 1
     fi
 }
+
