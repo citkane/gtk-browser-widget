@@ -8,7 +8,11 @@ NUGET=$PACKAGES_DIR/bin/nuget.exe
 PACKAGES_DOWNLOAD_DIR="$PACKAGES_DIR/.downloads"
 
 MSWEBVIEW_NUGET_V=1.0.3351.48
-CHROMIUM_NUGET_V=138.0.17
+CHROMIUM_FIRST_PART_V=138.0.33
+CHROMIUM_SECOND_PART_V=g276ed6d
+CHROMIUM_THIRD_PART_V=138.0.7204.169
+CEF_TARGET_DIR="$PACKAGES_DIR/cef"
+
 
 WEBKIT_WPE_V=2.48.3
 WEBKIT_BACKEND_V=1.16.0
@@ -34,9 +38,8 @@ set_sys_opts() {
 }
 
 install_cef() {
-    verify_nuget
-    $NUGET install chromiumembeddedframework.runtime -Version $CHROMIUM_NUGET_V -OutputDirectory "$PACKAGES_DIR"
-    echo "CEF installed successfully"
+    # Nuget doesn't work fill in once install is complete
+    echo "nothing"
 }
 
 install_mswebview2() {   
@@ -109,6 +112,78 @@ download_webkit() {
 }
 
 # params:
+# $1 - cef_src_dir
+# $2 - backend_src_dir
+# $3 - lib_src_dir
+download_cef_windows_64() {
+    local cef_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_windows64.tar.bz2"
+    local sha_1_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_windows64.tar.bz2.sha1"
+    local cef_target_dir="$PACKAGES_DIR/cef"  # Define a valid target directory
+
+    if ! download_tar_bz2 "$cef_uri" "$sha_1_uri" "$cef_target_dir"; then
+        return 1
+    fi
+}
+
+download_cef_windows_32() {
+    local cef_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_windows32.tar.bz2"
+    local sha_1_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_windows32.tar.bz2.sha1"
+    local cef_target_dir="$PACKAGES_DIR/cef"  # Define a valid target directory
+
+    if ! download_tar_bz2 "$cef_uri" "$sha_1_uri" "$cef_target_dir"; then
+        return 1
+    fi
+}
+
+download_cef_mac_64_bit() {
+    local cef_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_macosx64.tar.bz2"
+    local sha_1_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_macosx64.tar.bz2.sha1"
+    local cef_target_dir="$PACKAGES_DIR/cef"  # Define a valid target directory
+
+    if ! download_tar_bz2 "$cef_uri" "$sha_1_uri" "$cef_target_dir"; then
+        return 1
+    fi
+}
+
+download_cef_linux_64_bit() {
+    local cef_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_linux64.tar.bz2"
+    local sha_1_uri="https://cef-builds.spotifycdn.com/cef_binary_${CHROMIUM_FIRST_PART_V}%2B${CHROMIUM_SECOND_PART_V}%2Bchromium-${CHROMIUM_THIRD_PART_V}_linux64.tar.bz2.sha1"
+    local cef_target_dir="$PACKAGES_DIR/cef"  # Define a valid target directory
+
+    if ! download_tar_bz2 "$cef_uri" "$sha_1_uri" "$cef_target_dir"; then
+        return 1
+    fi
+}
+# params:
+# $1 - the tar.bz2 file url
+# $2 - the tar.bz2.sums checksum file url
+# $3 - the target extraction dir
+download_tar_bz2() {
+    if [ -d "$3" ]; then
+        return 0
+    fi
+
+    local dl_target
+    local dl_sums_target
+    dl_target="$PACKAGES_DOWNLOAD_DIR/$(basename "$1")"
+    dl_sums_target="$PACKAGES_DOWNLOAD_DIR/$(basename "$2")"
+
+    if [ ! -f "$dl_target" ]; then
+        curl -o "$dl_target" "$1" --create-dirs
+    fi
+    if [ ! -f "$dl_sums_target" ]; then
+        curl -o "$dl_sums_target" "$2" --create-dirs
+    fi
+    # Ensure the target extraction directory exists
+    mkdir -p "$3"
+
+    if check_sha1sum "$dl_target" "$dl_sums_target"; then
+        tar -xf "$dl_target" -C "$3"
+    fi
+}
+
+
+# params:
 # $1 - the tar.xz file url
 # $2 - the tar.xz.sums checksum file url
 # $3 - the target extraction dir
@@ -150,6 +225,30 @@ check_sha256sum() {
     sha256sum -c "$hash_file_path"
 }
 
+check_sha1sum() {
+    local hash
+    local temp_hash_file
+    local file_name
+
+    file_name=$(basename "$1")
+    temp_hash_file="$PACKAGES_DOWNLOAD_DIR/$file_name.sha1.tmp"
+
+    # Read the hash directly from the .sha1 file
+    hash=$(awk '{print $1}' "$2")  # Extract only the checksum
+
+    # Format the hash file for sha1sum
+    echo "$hash  $1" > "$temp_hash_file"
+
+    # Verify the checksum
+    if ! sha1sum -c "$temp_hash_file"; then
+        echo "SHA1 checksum verification failed!"
+        rm -f "$temp_hash_file"
+        return 1
+    fi
+
+    # Clean up the temporary file
+    rm -f "$temp_hash_file"
+}
 verify_nuget() {
     if [ ! -f "$NUGET" ]; then
         curl -o "$NUGET" https://dist.nuget.org/win-x86-commandline/latest/nuget.exe --create-dirs
