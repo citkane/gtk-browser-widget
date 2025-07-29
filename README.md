@@ -4,15 +4,18 @@
   <img width="600" alt="Gtk Browser Widget" src="https://github.com/user-attachments/assets/6933e9b3-8a31-47a9-9b77-c05b70e1e420" />
 </p>
 
+> [!WARNING]
+> **This is pre-ALPHA work in progress software**
+
 
 GBW is a cross-platform [GTK 4](https://www.gtk.org/) widget that makes available an embedded browser engine of your choice:
 - MsWebview2 (ALPHA)
-- Webkit (todo) - [discussion](https://github.com/citkane/gtk-browser-widget/discussions/4)
-- Chromium (todo)
+- Webkit (in progress) - [discussion](https://github.com/citkane/gtk-browser-widget/discussions/4)
+- Chromium (in progress)
 
-GBW is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library. More [language bindings](#language-bindings-todo) are planned for the future.
+GBW is developed with the [gtkmm 4](https://gtkmm.gnome.org/en/) C++  library. More [language bindings](#language-bindings-roadmap) are on the roadmap.
 
-### Minimal usage:
+### Minimal usage example (C++):
 ```c++
 // gtkmm headers MUST be included first
 #include <gtkmm/applicationwindow.h>
@@ -58,6 +61,7 @@ pacman -Suy # Do this twice for a fresh install to update the core
 pacman -S mingw-w64-ucrt-x86_64-clang-tools-extra
 pacman -S mingw-w64-ucrt-x86_64-cmake
 pacman -S mingw-w64-ucrt-x86_64-gtkmm-4.0
+pacman -S git
 
 # Clone the GBW repository
 git clone https://github.com/citkane/gtk-browser-widget.git
@@ -65,9 +69,8 @@ cd gtk-browser-widget
 
 # Use the installer script 
 source installer.sh
-select_browser mswebview2 # default is Chromium
+## Answer the prompts to select your build
 packages_install
-set_target examples/mswebview2/main.cc
 generate
 build
 install
@@ -102,16 +105,13 @@ Plugins optionally extend GBW to provide functionallity for common usage pattern
 #### Bind (todo)
 Provides an easy to consume interface that binds native callback functions to browser-side javascript functions.
 
-## Language Bindings (todo)
-GBW is developed in C++, but will aim to provide bindings for other GTK supported languages.
-
-Support for the following languages is planned:
-
+## Language Bindings (roadmap)
+GBW is developed in C++, but will provide bindings for other GTK supported languages:
 
 - C
+- C# (via Gir.Core)
 - JavaScript
-- Perl
 - Python
+- Perl
 - Rust
 - Vala 
-- C# (via Gir.Core)
