@@ -33,16 +33,9 @@ jobs:
       run: |
         Set-ExecutionPolicy Bypass -Scope Process -Force
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         choco install -y xampp-81 python311 ruby cmake gperf llvm ninja
         choco install -y cmake --version 3.31.3
         python -m pip install pywin32
-        
-    - name: Add VS2022 and Desktop C++ workload
-      uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: '2022'
-        components: 'Microsoft.VisualStudio.Workload.NativeDesktop'
 
     - name: Set environment variables for build
       shell: cmd
