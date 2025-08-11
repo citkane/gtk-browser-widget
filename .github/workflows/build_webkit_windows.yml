@@ -17,11 +17,12 @@ jobs:
       VCPKG_ROOT: 'C:\Program Files\vcpkg'
    
     steps:
-    - uses: actions/checkout@v4
     - name: Install Windows requirements
       run: |
-        choco install -y gperf ninja
+        choco install -y gperf
+        choco install ninja --force
         python -m pip install pywin32
+        where ninja
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
@@ -43,6 +44,7 @@ jobs:
         git config --global core.longpaths true
 
     - name: Restore WebKit checkout from cache
+      id: cache-webkit
       uses: actions/cache@v3
       with:
         path: WebKit
