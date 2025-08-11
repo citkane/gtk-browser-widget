@@ -17,12 +17,11 @@ jobs:
       VCPKG_ROOT: 'C:\Program Files\vcpkg'
    
     steps:
+    - uses: actions/checkout@v4
     - name: Install Windows requirements
       run: |
         choco install -y gperf ninja
         python -m pip install pywin32
-        
-    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
@@ -64,7 +63,7 @@ jobs:
         path: WebKit
         key: webkit-${{ github.event.inputs.webkit_hash }}
         
-    - name: Set environment variables for build
+    - name: Build WebKit
       shell: cmd
       working-directory: WebKit
       run: |
@@ -83,11 +82,8 @@ jobs:
         echo CXX=%CXX%
         echo VSPATH=%VSPATH%
         call "%VSPATH%\VC\Auxiliary\Build\vcvars64.bat"
-
-    - name: Build WebKit
-      working-directory: WebKit
-      run: |
-        & perl .\Tools\Scripts\build-webkit --release --platform=win --prefix="${{ env.WEBKIT_INSTALL_DIR }}"
+        cd %~dp0WebKit
+        perl .\Tools\Scripts\build-webkit --release --platform=win --prefix="${{ env.WEBKIT_INSTALL_DIR }}"
 
     - name: Post-build:Install and Copy Headers
       shell: bash
