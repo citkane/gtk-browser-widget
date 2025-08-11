@@ -11,11 +11,10 @@ on:
 jobs:
   build:
     runs-on: windows-2022
-
-
     env:
       WEBKIT_INSTALL_DIR: ${{ github.workspace }}\webkit-install
       WEBKIT_HEADERS_DIR: ${{ github.workspace }}\webkit-install\webkit-headers
+      VCPKG_ROOT: 'C:\Program Files\vcpkg'
    
     steps:
     - name: Install Windows requirements
