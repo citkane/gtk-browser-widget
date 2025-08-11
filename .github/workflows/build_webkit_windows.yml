@@ -5,18 +5,39 @@ on:
     inputs:
       webkit_hash:
         description: 'Commit hash of WebKit/WebKit to build'
-        required: true
+        required: true 
         default: 'main'
 
 jobs:
   build:
     runs-on: windows-2022
-    
+
+
     env:
       WEBKIT_INSTALL_DIR: ${{ github.workspace }}\webkit-install
       WEBKIT_HEADERS_DIR: ${{ github.workspace }}\webkit-install\webkit-headers
    
     steps:
+    - name: Install Windows requirements
+      run: |
+        choco install -y xampp-81 gperf ninja
+        python -m pip install pywin32
+        
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4'
+        bundler-cache: true 
+        
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31'
+    
     - name: Enable long paths in Windows
       run: |
         Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
@@ -37,14 +58,6 @@ jobs:
         repository: 'WebKit/WebKit'
         ref: ${{ github.event.inputs.webkit_hash }}
         path: WebKit
-
-    - name: Install Windows requirements
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        choco install -y xampp-81 python311 ruby cmake gperf llvm ninja
-        choco install -y cmake --version 3.31.3
-        python -m pip install pywin32
 
     - name: Set environment variables for build
       shell: cmd
