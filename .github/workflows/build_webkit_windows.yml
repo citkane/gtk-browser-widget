@@ -26,23 +26,22 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4'
         bundler-cache: true 
-        
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
+    - uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '3.31'
-    
+    - uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: "5.32"
+        distribution: strawberry
+        
     - name: Enable long paths in Windows
       run: |
         Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
-        
-    - name: Enable git long paths (global fallback)
-      run: git config --global core.longpaths true
+        git config --global core.longpaths true
 
     - name: Restore WebKit checkout from cache
       uses: actions/cache@v3
@@ -50,14 +49,21 @@ jobs:
         path: WebKit
         key: webkit-${{ github.event.inputs.webkit_hash }}
         
-    - name: Checkout repository at hash
+    - name: Checkout Webkit at hash
       if: steps.cache-webkit.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: 'WebKit/WebKit'
         ref: ${{ github.event.inputs.webkit_hash }}
         path: WebKit
-
+        
+    - name: Save WebKit checkout to cache
+      if: steps.cache-webkit.outputs.cache-hit != 'true'
+      uses: actions/cache@v3
+      with:
+        path: WebKit
+        key: webkit-${{ github.event.inputs.webkit_hash }}
+        
     - name: Set environment variables for build
       shell: cmd
       working-directory: WebKit
