@@ -1,0 +1,90 @@
+name: Build WebKit on Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      webkit_hash:
+        description: 'Commit hash of WebKit/WebKit to build'
+        required: true
+        default: 'main'
+
+jobs:
+  build:
+    runs-on: windows-2022
+    
+    env:
+      WEBKIT_INSTALL_DIR: ${{ github.workspace }}\webkit-install
+      WEBKIT_HEADERS_DIR: ${{ github.workspace }}\webkit-install\webkit-headers
+      
+    steps:
+    - name: Checkout repository at hash
+      uses: actions/checkout@v4
+      with:
+        repository: 'WebKit/WebKit'
+        ref: ${{ github.event.inputs.webkit_hash }}
+        path: WebKit
+
+    - name: Install Chocolatey and Windows requirements
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        choco install -y xampp-81 python311 ruby git cmake gperf llvm ninja
+        choco install -y cmake --version 3.31.3
+        python -m pip install pywin32
+        
+    - name: Add VS2022 and Desktop C++ workload
+      uses: microsoft/setup-msbuild@v2
+      with:
+        vs-version: '2022'
+        components: 'Microsoft.VisualStudio.Workload.NativeDesktop'
+
+    - name: Set environment variables for build
+      shell: cmd
+      working-directory: WebKit
+      run: |
+        set "PATH=C:\xampp\apache\bin;%PATH%"
+        set "PATH=C:\xampp\perl\bin;%PATH%"
+        set "PATH=%ProgramFiles%\CMake\bin;%PATH%"
+        set "PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer;%PATH%"
+        for /F "usebackq delims=" %%I in (`vswhere.exe -latest -property installationPath`) do set VSPATH=%%I
+        set "PATH=%~dp0WebKitLibraries\win\bin;%PATH%"
+        set "WEBKIT_TESTFONTS=%~dp0Tools\WebKitTestRunner\fonts"
+        set "DUMPRENDERTREE_TEMP=%TEMP%"
+        set "CC=clang-cl"
+        set "CXX=clang-cl"
+        echo %PATH%
+        echo WEBKIT_TESTFONTS=%WEBKIT_TESTFONTS%
+        echo DUMPRENDERTREE_TEMP=%DUMPRENDERTREE_TEMP%
+        echo CC=%CC%
+        echo CXX=%CXX%
+        echo VSPATH=%VSPATH%
+        call "%VSPATH%\VC\Auxiliary\Build\vcvars64.bat"
+
+    - name: Build WebKit
+      working-directory: WebKit
+      run: |
+        & perl .\Tools\Scripts\build-webkit --release --platform=win --prefix="${{ env.WEBKIT_INSTALL_DIR }}"
+
+    - name: Post-build: Install and Copy Headers
+      shell: bash
+      working-directory: WebKit/Release
+      run: |
+        cmake --install 
+        mkdir -p "${{ env.WEBKIT_HEADERS_DIR }}"
+        for dir in */; do
+          if [ ! -d "$dir/Headers" ]; then
+            continue
+          fi
+          cp -r "$dir/Headers/"* "${{ env.WEBKIT_HEADERS_DIR }}"
+        done
+
+    - name: Compress install folder for download
+      run: |
+        Compress-Archive -Path "${{ env.WEBKIT_INSTALL_DIR }}" -DestinationPath "${{ env.WEBKIT_INSTALL_DIR }}.zip"
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: webkit-windows-build
+        path: ${{ env.WEBKIT_INSTALL_DIR }}.zip
