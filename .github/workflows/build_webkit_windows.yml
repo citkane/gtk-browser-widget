@@ -15,8 +15,13 @@ jobs:
     env:
       WEBKIT_INSTALL_DIR: ${{ github.workspace }}\webkit-install
       WEBKIT_HEADERS_DIR: ${{ github.workspace }}\webkit-install\webkit-headers
-      
+   
     steps:
+    - name: Enable long paths in Windows
+      run: |
+        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
+    - name: Enable git long paths (global fallback)
+      run: git config --global core.longpaths true
     - name: Checkout repository at hash
       uses: actions/checkout@v4
       with:
