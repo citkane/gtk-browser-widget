@@ -84,7 +84,7 @@ jobs:
         Compress-Archive -Path "${{ env.WEBKIT_INSTALL_DIR }}" -DestinationPath "${{ env.WEBKIT_INSTALL_DIR }}.zip"
 
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: webkit-windows-build
         path: ${{ env.WEBKIT_INSTALL_DIR }}.zip
